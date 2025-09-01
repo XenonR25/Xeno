@@ -1,0 +1,98 @@
+---
+
+## 📂 Database Schema (Text Form)
+
+### **User**
+
+* UserId (int8, primary key)
+* created\_at (timestamptz)
+* updated\_at (timestamp)
+* UserName (varchar)
+* Email (varchar)
+* Phone (varchar)
+
+---
+
+### **Books**
+
+* BookId (int8, primary key)
+* created\_at (timestamptz)
+* Name (varchar)
+* author (varchar)
+* uploaded\_at (timestamp)
+* lastopened\_at (timestamp)
+* UserId (int8, foreign key → User.UserId)
+
+---
+
+### **Pages**
+
+* PageId (int8, primary key)
+* pageNumber (int8)
+* pageURL (varchar)
+* BookId (int8, foreign key → Books.BookId)
+
+---
+
+### **Explanation**
+
+* ExplanationId (int8, primary key)
+* created\_at (timestamptz)
+* Response (varchar)
+* CategoryId (int8, foreign key → Category.CategoryId)
+* PageId (int8, foreign key → Pages.PageId)
+
+---
+
+### **Category**
+
+* CategoryId (int8, primary key)
+* created\_at (timestamptz)
+* Name (text)
+* Description (varchar)
+* ModelId (int8, foreign key → Model.ModelId)
+* PromptId (int8, foreign key → Prompting.PromptId)
+
+---
+
+### **Model**
+
+* ModelId (int8, primary key)
+* created\_at (timestamptz)
+* ModelName (text)
+* Description (varchar)
+
+---
+
+### **Prompting**
+
+* PromptId (int8, primary key)
+* created\_at (timestamptz)
+* Prompt (varchar)
+
+---
+
+### **Quizzes**
+
+* QuizId (int8, primary key)
+* created\_at (timestamptz)
+* Score (float8)
+* updated\_at (timestamp)
+* Difficulty (varchar)
+* Pages (json)
+
+---
+
+### **Questions**
+
+* QuestionId (int8, primary key)
+* created\_at (timestamptz)
+* Questions (varchar)
+* Answers (varchar)
+* myAnswer (varchar)
+* Options (json)
+* Explanation (varchar)
+* QuizId (int8, foreign key → Quizzes.QuizId)
+
+---
+
