@@ -1,269 +1,92 @@
-# Xeno API Server
+# Xeno – AI-Powered Study Platform
 
-A comprehensive Node.js Express server with PostgreSQL database, user authentication, and Swagger documentation.
+![Xeno Banner](https://image.pngaaa.com/998/2745998-middle.png) <!-- Optional: Replace with your actual banner/image URL -->
 
-## Features
+**Xeno** is an interactive, AI-powered web application designed to revolutionize your study experience. Upload any study document or PDF, and Xeno will automatically generate insightful quizzes and multiple-choice questions to test your understanding on the spot!  
 
-- 🔐 **User Authentication**: Signup, login, JWT token-based authentication
-- 👤 **User Management**: CRUD operations for users, profile management
-- 📚 **Database Integration**: PostgreSQL with automatic table creation
-- 📖 **API Documentation**: Interactive Swagger UI documentation
-- 🚀 **Express Server**: Fast and scalable REST API
-- 🔒 **Security**: Password hashing, JWT tokens, input validation
+Xeno is fully responsive and dynamic, offering engaging animations and a seamless user experience. The system leverages OpenAI's API to analyze documents and produce questions and answers tailored to your material. Results are provided at the end of each quiz, helping you track learning progress in real-time.
 
-## Database Schema
+---
 
-The server automatically creates the following tables based on your schema:
+## ✨ Features
 
-- **User**: User accounts with authentication
-- **Books**: User's book collection
-- **Pages**: Book pages with URLs
-- **Category**: Content categories
-- **Model**: AI models
-- **Prompting**: AI prompts
-- **Explanation**: AI explanations for content
-- **Quizzes**: User quiz results
-- **Questions**: Quiz questions and answers
+- **Upload Study Materials**: Supports PDF/document uploads for smart quiz generation.
+- **AI-Generated Quizzes**: Uses OpenAI's API to create high-quality questions & answers based on your material.
+- **Multiple-Choice Questions**: Engaging, interactive MCQs with instant feedback and scoring.
+- **Real-Time Results**: Get detailed feedback and results after completing each quiz.
+- **Responsive Design**: Smooth experience on desktop, tablet, and mobile.
+- **Dynamic Animations**: Cool, modern UI animations for enhanced interactivity.
+- **Secure & Scalable Backend**: Built with FastAPI and PostgreSQL for fast and robust performance.
 
-## Prerequisites
+---
 
-- Node.js (v14 or higher)
-- PostgreSQL database (Supabase in this case)
-- npm or yarn package manager
+## 🛠️ Tech Stack
 
-## Installation
+- **Frontend**: [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/)
+- **Backend**: [FastAPI](https://fastapi.tiangolo.com/)
+- **Database**: [PostgreSQL](https://www.postgresql.org/)
+- **AI/ML Integration**: [OpenAI API](https://platform.openai.com/docs/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/) (or similar)
+- **Other**: RESTful API, JWT Authentication (planned), Cloud Storage (planned)
 
-1. **Clone the repository and install dependencies:**
+---
 
-   ```bash
-   npm install
-   ```
+## 🚀 Getting Started
 
-2. **Database Configuration:**
-   The database connection is already configured in `server/db.js` with your Supabase credentials.
+### Prerequisites
 
-3. **Install additional dependencies:**
-   ```bash
-   npm install jsonwebtoken swagger-jsdoc swagger-ui-express
-   ```
+- Node.js ≥ 18.x, npm/yarn
+- Python ≥ 3.9, pip
+- PostgreSQL instance
+- OpenAI API key
 
-## Running the Server
-
-### Development Mode
+### 1. Clone the repository
 
 ```bash
-npm run dev
+git clone https://github.com/yourusername/xeno.git
+cd xeno
 ```
-
-### Production Mode
+### 2. Setup the backend
 
 ```bash
-npm start
+cd backend
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate (Windows)
+pip install -r requirements.txt
+
+
+# Set your environment variables (OpenAI key, DB config)
+cp .env.example .env
+# Edit .env with your details
+
+# Run FastAPI server
+uvicorn main:app --reload
 ```
-
-The server will start on port 5000 and automatically:
-
-- Connect to your PostgreSQL database
-- Create/verify all required tables
-- Start the Express server
-- Initialize Swagger documentation
-
-## API Endpoints
-
-### Authentication
-
-- `POST /api/users/signup` - User registration
-- `POST /api/users/login` - User login
-
-### User Management
-
-- `GET /api/users/profile` - Get user profile (authenticated)
-- `PUT /api/users/profile` - Update user profile (authenticated)
-- `GET /api/users` - Get all users (authenticated, paginated)
-- `GET /api/users/:userId` - Get user by ID (authenticated)
-- `DELETE /api/users/:userId` - Delete user (authenticated)
-- `POST /api/users/change-password` - Change password (authenticated)
-
-### System
-
-- `GET /` - Server information
-- `GET /api/health` - Health check
-- `GET /api/db-test` - Database connection test
-- `GET /api-docs` - Swagger API documentation
-
-## API Documentation
-
-Once the server is running, visit `http://localhost:5000/api-docs` to access the interactive Swagger documentation.
-
-## Authentication
-
-The API uses JWT (JSON Web Tokens) for authentication:
-
-1. **Signup/Login**: Get a JWT token
-2. **Protected Routes**: Include the token in the Authorization header:
-   ```
-   Authorization: Bearer <your-jwt-token>
-   ```
-
-## Example Usage
-
-### User Registration
+### 3. Setup the frontend
 
 ```bash
-curl -X POST http://localhost:5000/api/users/signup \
-  -H "Content-Type: application/json" \
-  -d '{
-    "UserName": "John Doe",
-    "Email": "john@example.com",
-    "Password": "password123",
-    "Phone": "+1234567890"
-  }'
+cd ../frontend
+npm install
+
+# Set your environment variables
+cp .env.local.example .env.local
+# Edit .env.local with your API base URL etc.
+
+npm run dev  # or yarn dev
 ```
+### 4. Visit http://localhost:3000 in your browser!
 
-### User Login
+### 📚 Example Usage
+- Upload your PDF/documents.
+- AI processes the material and generates multiple-choice quizzes.
+- Take the quiz: Answer MCQs, view cool animations and progress bars.
+- Submit: Instantly see your score and correct answers.
 
-```bash
-curl -X POST http://localhost:5000/api/users/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "Email": "john@example.com",
-    "Password": "password123"
-  }'
-```
-
-### Get Profile (Authenticated)
-
-```bash
-curl -X GET http://localhost:5000/api/users/profile \
-  -H "Authorization: Bearer <your-jwt-token>"
-```
-
-### Update Profile
-
-```bash
-curl -X PUT http://localhost:5000/api/users/profile \
-  -H "Authorization: Bearer <your-jwt-token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "UserName": "John Smith",
-    "Phone": "+1987654321"
-  }'
-```
-
-## Database Initialization
-
-The server automatically initializes the database on startup. If you need to manually initialize:
-
-```bash
-node server/init-db.js
-```
-
-## Environment Variables
-
-You can set the following environment variables:
-
-- `JWT_SECRET`: Secret key for JWT tokens (defaults to a development key)
-- `PORT`: Server port (defaults to 5000)
-
-## Security Features
-
-- **Password Hashing**: Uses PBKDF2 with salt for secure password storage
-- **JWT Tokens**: Secure authentication with configurable expiration
-- **Input Validation**: Comprehensive validation for all user inputs
-- **SQL Injection Protection**: Uses parameterized queries
-- **Rate Limiting**: Built-in protection against abuse
-
-## Error Handling
-
-The API returns consistent error responses:
-
-```json
-{
-  "status": "error",
-  "message": "Error description",
-  "error": "Detailed error information"
-}
-```
-
-## Success Responses
-
-Successful operations return:
-
-```json
-{
-  "status": "success",
-  "message": "Operation description",
-  "data": {
-    // Response data
-  }
-}
-```
-
-## Development
-
-### Project Structure
-
-```
-server/
-├── index.js          # Main server file
-├── db.js            # Database configuration
-├── init-db.js       # Database initialization
-├── swagger.js       # Swagger configuration
-├── utils/
-│   └── auth.js      # Authentication utilities
-└── routes/
-    └── users.js     # User management routes
-```
-
-### Adding New Routes
-
-1. Create a new route file in `server/routes/`
-2. Import and use it in `server/index.js`
-3. Add Swagger documentation using JSDoc comments
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Database Connection Failed**
-
-   - Check your database credentials in `server/db.js`
-   - Ensure your Supabase database is accessible
-
-2. **Port Already in Use**
-
-   - Change the PORT variable in `server/index.js`
-   - Or kill the process using port 5000
-
-3. **JWT Token Issues**
-   - Check if the token is expired
-   - Ensure the Authorization header format is correct
-
-### Logs
-
-The server provides detailed console logging for:
-
-- Database connection status
-- Server startup process
-- API requests and responses
-- Error details
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License.
-
-## Support
-
-For support and questions:
-
-- Check the API documentation at `/api-docs`
-- Review the server logs for error details
-- Ensure all dependencies are properly installed
+### 🧠 AI/ML Details
+- **Document Parsing**: Files are parsed and summarized using OpenAI's GPT model.
+- **Quiz Generation**: The AI creates contextually relevant questions & answers based on the uploaded content.
+- **Answer Checking**: User answers are compared against the AI's answers for result generation.
+  All processing is secure and user documents are not used for training.
+### 📩 Connect & Contributions
+Found a bug or want to suggest a feature? Pull requests and issues are welcome!
+Please open an issue or a discussion.
