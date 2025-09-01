@@ -405,6 +405,226 @@ async function processTextFileAndCreateBook(textFilePath, userId = 1) {
   }
 }
 
+// Generate unique page ID
+function generatePageId(bookId, pageNumber) {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  return `page_${bookId}_${pageNumber}_${timestamp}_${random}`;
+}
+
+// Upload individual page JPG to Cloudinary and create unique ID
+async function uploadPageToCloudinary(imagePath, bookId, pageNumber) {
+  try {
+    const pageId = generatePageId(bookId, pageNumber);
+    const cloudFolderName = `books/${bookId}/pages`;
+
+    // Upload the page image to Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(imagePath, {
+      resource_type: "image",
+      folder: cloudFolderName,
+      public_id: pageId,
+      use_filename: false,
+      unique_filename: false,
+      overwrite: false,
+    });
+
+    if (!uploadResult || !uploadResult.secure_url) {
+      throw new Error(`Failed to upload page ${pageNumber} to Cloudinary`);
+    }
+
+    return {
+      pageId,
+      pageNumber,
+      pageURL: uploadResult.secure_url,
+      publicId: uploadResult.public_id,
+      cloudinaryId: uploadResult.asset_id,
+    };
+  } catch (error) {
+    throw new Error(`Failed to upload page ${pageNumber}: ${error.message}`);
+  }
+}
+
+// Process PDF and upload all pages individually to Cloudinary
+async function processPdfAndUploadPages(pdfPath, bookId) {
+  try {
+    const timestamp = Date.now();
+    const cloudFolderName = `books/${timestamp}`;
+
+    // Upload PDF to Cloudinary (as image resource, Cloudinary supports PDFs)
+    const uploadResult = await cloudinary.uploader.upload(pdfPath, {
+      resource_type: "image",
+      folder: cloudFolderName,
+      use_filename: true,
+      unique_filename: true,
+    });
+
+    if (!uploadResult || !uploadResult.public_id) {
+      throw new Error("Failed to upload PDF to Cloudinary");
+    }
+
+    const publicId = uploadResult.public_id;
+    const version = uploadResult.version;
+    const totalPages = uploadResult.pages || 1;
+
+    // STEP 1: Process only the first page (cover) for book information
+    console.log("📖 Step 1: Processing cover page for book information...");
+    const coverUrl = buildPageImageUrl(publicId, version, 1);
+
+    // Extract text from cover page
+    console.log("🔍 Extracting text from Cloudinary cover image...");
+    const coverText = await extractTextFromImageUrl(coverUrl);
+
+    // Extract book information using Gemini AI
+    console.log("🤖 Analyzing book information with Gemini AI...");
+    const bookInfo = await extractBookInfo(coverText);
+
+    console.log(
+      `✅ Book info extracted: "${bookInfo.bookName}" by ${bookInfo.authorName}`
+    );
+
+    // STEP 2: Download all pages locally first
+    console.log("📄 Step 2: Downloading all pages locally...");
+
+    // Build URLs for all pages
+    const pageUrls = Array.from({ length: totalPages }).map((_, idx) => {
+      const pageNumber = idx + 1;
+      return {
+        pageNumber,
+        pageURL: buildPageImageUrl(publicId, version, pageNumber),
+      };
+    });
+
+    // Save images locally
+    const localRoot = path.join(__dirname, "../local_books", `${timestamp}`);
+    fs.mkdirSync(localRoot, { recursive: true });
+
+    console.log(`💾 Downloading ${pageUrls.length} pages to local storage...`);
+    const downloadTasks = pageUrls.map((p) => {
+      const dest = path.join(localRoot, `page-${p.pageNumber}.jpg`);
+      return downloadFile(p.pageURL, dest).then(() => {
+        p.localPath = dest;
+        return dest;
+      });
+    });
+
+    await Promise.all(downloadTasks);
+    console.log(`✅ All ${pageUrls.length} pages downloaded to: ${localRoot}`);
+
+    // STEP 3: Upload each page individually to Cloudinary with unique IDs
+    console.log("☁️ Step 3: Uploading individual pages to Cloudinary...");
+    const uploadTasks = pageUrls.map((page) =>
+      uploadPageToCloudinary(page.localPath, bookId, page.pageNumber)
+    );
+
+    const uploadedPages = await Promise.all(uploadTasks);
+    console.log(
+      `✅ All ${uploadedPages.length} pages uploaded to Cloudinary with unique IDs`
+    );
+
+    // Clean up local files
+    console.log("🧹 Cleaning up local files...");
+    pageUrls.forEach((page) => {
+      if (page.localPath && fs.existsSync(page.localPath)) {
+        try {
+          fs.unlinkSync(page.localPath);
+        } catch (error) {
+          console.warn(
+            `Failed to delete local file ${page.localPath}:`,
+            error.message
+          );
+        }
+      }
+    });
+
+    // Try to remove the local directory if empty
+    try {
+      if (fs.existsSync(localRoot) && fs.readdirSync(localRoot).length === 0) {
+        fs.rmdirSync(localRoot);
+      }
+    } catch (error) {
+      console.warn(
+        `Failed to remove local directory ${localRoot}:`,
+        error.message
+      );
+    }
+
+    return {
+      bookInfo,
+      pages: uploadedPages,
+      originalPdfPublicId: publicId,
+      originalPdfVersion: version,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Test function for Cloudinary page upload functionality
+async function testCloudinaryPageUpload(pdfPath, bookId = 999) {
+  try {
+    console.log("🧪 Testing Cloudinary page upload functionality...");
+    console.log("=".repeat(60));
+
+    if (!fs.existsSync(pdfPath)) {
+      throw new Error(`PDF file not found: ${pdfPath}`);
+    }
+
+    console.log(`📁 Processing PDF: ${pdfPath}`);
+    console.log(`📚 Book ID for testing: ${bookId}`);
+
+    // Test the generatePageId function first
+    const testPageId = generatePageId(bookId, 1);
+    console.log(`✅ Generated test page ID: ${testPageId}`);
+
+    // Process PDF and upload all pages individually
+    const result = await processPdfAndUploadPages(pdfPath, bookId);
+
+    console.log("\n" + "=".repeat(60));
+    console.log("📖 CLOUDINARY PAGE UPLOAD RESULTS:");
+    console.log("=".repeat(60));
+    console.log(
+      `📚 Book: "${result.bookInfo.bookName}" by ${result.bookInfo.authorName}`
+    );
+    console.log(`📄 Total pages processed: ${result.pages.length}`);
+    console.log(`☁️ Original PDF Public ID: ${result.originalPdfPublicId}`);
+    console.log(`🔢 Original PDF Version: ${result.originalPdfVersion}`);
+
+    console.log("\n📋 Individual Page Details:");
+    console.log("-".repeat(40));
+    result.pages.forEach((page, index) => {
+      console.log(`Page ${page.pageNumber}:`);
+      console.log(`  📄 Unique ID: ${page.pageId}`);
+      console.log(`  🔗 URL: ${page.pageURL}`);
+      console.log(`  ☁️ Cloudinary ID: ${page.cloudinaryId}`);
+      console.log(`  🆔 Public ID: ${page.publicId}`);
+      console.log("");
+    });
+
+    // Save results to file
+    const outputDir = path.join(__dirname, "../test_output");
+    fs.mkdirSync(outputDir, { recursive: true });
+
+    const outputFile = path.join(
+      outputDir,
+      `cloudinary_pages_result_${Date.now()}.json`
+    );
+    fs.writeFileSync(outputFile, JSON.stringify(result, null, 2));
+    console.log(`💾 Results saved to: ${outputFile}`);
+
+    return {
+      success: true,
+      result,
+      outputFile,
+    };
+  } catch (error) {
+    console.error("❌ Cloudinary page upload test failed:", error.message);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
+
 // Main test function
 async function runAllTests() {
   console.log("🚀 Starting OCR Test Suite...");
@@ -452,6 +672,17 @@ async function runAllTests() {
     console.log("❌ Book creation test failed!");
   }
 
+  // Test 5: Cloudinary page upload functionality
+  console.log("\n📋 TEST 5: Cloudinary page upload functionality");
+  console.log("-".repeat(40));
+  const cloudinaryResult = await testCloudinaryPageUpload(pdfPath, 999);
+
+  if (cloudinaryResult.success) {
+    console.log("✅ Cloudinary page upload test completed successfully!");
+  } else {
+    console.log("❌ Cloudinary page upload test failed!");
+  }
+
   console.log("\n" + "=".repeat(60));
   console.log("🏁 OCR Test Suite completed!");
 }
@@ -465,6 +696,10 @@ module.exports = {
   extractBookInfo,
   generateGenericBookInfo,
   processTextFileAndCreateBook,
+  generatePageId,
+  uploadPageToCloudinary,
+  processPdfAndUploadPages,
+  testCloudinaryPageUpload,
   runAllTests,
 };
 

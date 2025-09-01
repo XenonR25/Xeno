@@ -5,7 +5,10 @@ const fs = require("fs");
 const postgres = require("postgres");
 const { DATABASE_URL } = require("../db.js");
 const { authenticateToken } = require("../utils/auth.js");
-const { processPdfAndExtractInfo } = require("../utils/pdfProcessor.js");
+const {
+  processPdfAndExtractInfo,
+  processPdfAndUploadPages,
+} = require("../utils/pdfProcessor.js");
 
 const router = express.Router();
 const sql = postgres(DATABASE_URL, {
@@ -98,36 +101,52 @@ router.post(
         `📚 Processing PDF for user ${userId}: ${req.file.originalname}`
       );
 
-      // STEP 1: Process PDF and extract book information from cover page
-      console.log(
-        "🔄 Step 1: Processing PDF and extracting book information..."
-      );
-      const processingResult = await processPdfAndExtractInfo(pdfPath);
-
-      // STEP 2: Create book record with extracted information
-      console.log("📝 Step 2: Creating book record in database...");
-      const newBook = await sql`
+      // STEP 1: Create book record first (we'll need the bookId for page processing)
+      console.log("📝 Step 1: Creating initial book record...");
+      const tempBook = await sql`
         INSERT INTO "Books" ("Name", "author", "UserId")
-        VALUES (${processingResult.bookInfo.bookName}, ${processingResult.bookInfo.authorName}, ${userId})
+        VALUES ('Processing...', 'Processing...', ${userId})
+        RETURNING "BookId"
+      `;
+
+      if (tempBook.length === 0) {
+        throw new Error("Failed to create initial book record");
+      }
+
+      const bookId = tempBook[0].BookId;
+      console.log(`✅ Initial book created with ID: ${bookId}`);
+
+      // STEP 2: Process PDF and upload all pages individually to Cloudinary
+      console.log(
+        "🔄 Step 2: Processing PDF and uploading pages to Cloudinary..."
+      );
+      const processingResult = await processPdfAndUploadPages(pdfPath, bookId);
+
+      // STEP 3: Update book record with extracted information
+      console.log(
+        "📝 Step 3: Updating book record with extracted information..."
+      );
+      const updatedBook = await sql`
+        UPDATE "Books" 
+        SET "Name" = ${processingResult.bookInfo.bookName}, 
+            "author" = ${processingResult.bookInfo.authorName}
+        WHERE "BookId" = ${bookId}
         RETURNING "BookId", "Name", "author", "created_at", "uploaded_at"
       `;
 
-      if (newBook.length === 0) {
-        throw new Error("Failed to create book record");
-      }
+      console.log(
+        `✅ Book updated: "${updatedBook[0].Name}" by ${updatedBook[0].author}`
+      );
 
-      const bookId = newBook[0].BookId;
-      console.log(`✅ Book created with ID: ${bookId}`);
-
-      // STEP 3: Create page records for all pages
-      console.log("📄 Step 3: Creating page records in database...");
+      // STEP 4: Create page records for all uploaded pages
+      console.log("📄 Step 4: Creating page records in database...");
       const pageResults = await Promise.all(
         processingResult.pages.map(
           (page) =>
             sql`
-            INSERT INTO "Pages" ("pageNumber", "pageURL", "BookId")
-            VALUES (${page.pageNumber}, ${page.pageURL}, ${bookId})
-            RETURNING "PageId", "pageNumber", "pageURL"
+            INSERT INTO "Pages" ("pageNumber", "pageURL", "uniquePageId", "cloudinaryId", "publicId", "BookId")
+            VALUES (${page.pageNumber}, ${page.pageURL}, ${page.pageId}, ${page.cloudinaryId}, ${page.publicId}, ${bookId})
+            RETURNING "PageId", "pageNumber", "pageURL", "uniquePageId", "cloudinaryId", "publicId"
           `
         )
       );
@@ -146,18 +165,19 @@ router.post(
         message: "Book created successfully",
         data: {
           book: {
-            BookId: newBook[0].BookId,
-            Name: newBook[0].Name,
-            author: newBook[0].author,
-            created_at: newBook[0].created_at,
-            uploaded_at: newBook[0].uploaded_at,
+            BookId: updatedBook[0].BookId,
+            Name: updatedBook[0].Name,
+            author: updatedBook[0].author,
+            created_at: updatedBook[0].created_at,
+            uploaded_at: updatedBook[0].uploaded_at,
             totalPages: processingResult.pages.length,
           },
           pages: pageResults.map((result) => result[0]),
           processingInfo: {
             extractedText: processingResult.bookInfo,
             imagesGenerated: processingResult.pages.length,
-            localFolder: processingResult.localFolder || undefined,
+            originalPdfPublicId: processingResult.originalPdfPublicId,
+            originalPdfVersion: processingResult.originalPdfVersion,
           },
         },
       });
@@ -295,7 +315,7 @@ router.get("/:bookId", authenticateToken, async (req, res) => {
 
     // Get all pages for the book
     const pages = await sql`
-      SELECT "PageId", "pageNumber", "pageURL"
+      SELECT "PageId", "pageNumber", "pageURL", "uniquePageId", "cloudinaryId", "publicId"
       FROM "Pages" 
       WHERE "BookId" = ${parseInt(bookId)}
       ORDER BY "pageNumber"
@@ -428,7 +448,7 @@ router.get("/:bookId/pages", authenticateToken, async (req, res) => {
 
     // Get all pages
     const pages = await sql`
-      SELECT "PageId", "pageNumber", "pageURL"
+      SELECT "PageId", "pageNumber", "pageURL", "uniquePageId", "cloudinaryId", "publicId"
       FROM "Pages" 
       WHERE "BookId" = ${parseInt(bookId)}
       ORDER BY "pageNumber"
@@ -444,6 +464,69 @@ router.get("/:bookId/pages", authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error("Get pages error:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/books/pages/{uniquePageId}:
+ *   get:
+ *     summary: Get a specific page by its unique page ID
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: uniquePageId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Unique page ID
+ *     responses:
+ *       200:
+ *         description: Page retrieved successfully
+ *       404:
+ *         description: Page not found
+ */
+router.get("/pages/:uniquePageId", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { uniquePageId } = req.params;
+
+    // Get page with book information
+    const page = await sql`
+      SELECT p."PageId", p."pageNumber", p."pageURL", p."uniquePageId", p."cloudinaryId", p."publicId",
+             b."BookId", b."Name" as bookName, b."author"
+      FROM "Pages" p
+      JOIN "Books" b ON p."BookId" = b."BookId"
+      WHERE p."uniquePageId" = ${uniquePageId} AND b."UserId" = ${userId}
+    `;
+
+    if (page.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Page not found",
+      });
+    }
+
+    return res.json({
+      status: "success",
+      data: {
+        page: page[0],
+        book: {
+          BookId: page[0].BookId,
+          Name: page[0].bookName,
+          author: page[0].author,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Get page by unique ID error:", error);
     return res.status(500).json({
       status: "error",
       message: "Internal server error",

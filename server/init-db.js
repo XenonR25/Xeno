@@ -46,6 +46,9 @@ async function initializeDatabase() {
         "PageId" BIGSERIAL PRIMARY KEY,
         "pageNumber" BIGINT NOT NULL,
         "pageURL" VARCHAR(500),
+        "uniquePageId" VARCHAR(255) UNIQUE,
+        "cloudinaryId" VARCHAR(255),
+        "publicId" VARCHAR(255),
         "BookId" BIGINT REFERENCES "Books"("BookId") ON DELETE CASCADE
       );
     `;

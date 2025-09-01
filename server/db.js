@@ -1,9 +1,9 @@
 const DATABASE_URL =
-  "postgresql://postgres.gnckqimbtdmxobksoaty:o7vj2DeOwjZ2zIn5@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres";
+  "auiefhiuhd";
 
 const CLOUDINARY_URL =
-  "cloudinary://514388911658614:Au6kWd3igXPMVG6qe9Orql9H9eg@dkwjobljf";
-const GEMINI_API_KEY = "AIzaSyDfy-D8DCwyCtCPxl4re1UaUE9O6BiGbas";
+  "osiegjaouaufabn";
+const GEMINI_API_KEY = "wognuiledisodin";
 
 
 

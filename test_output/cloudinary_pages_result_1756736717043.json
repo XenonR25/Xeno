@@ -1,0 +1,255 @@
+{
+  "bookInfo": {
+    "bookName": "Unknown",
+    "authorName": "Unknown"
+  },
+  "pages": [
+    {
+      "pageId": "page_999_1_1756736711000_00lhhr",
+      "pageNumber": 1,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_1_1756736711000_00lhhr.jpg",
+      "publicId": "books/999/pages/page_999_1_1756736711000_00lhhr",
+      "cloudinaryId": "1b760453ae24b8a3acd937efa6e1e412"
+    },
+    {
+      "pageId": "page_999_2_1756736711002_i9b4b6",
+      "pageNumber": 2,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_2_1756736711002_i9b4b6.jpg",
+      "publicId": "books/999/pages/page_999_2_1756736711002_i9b4b6",
+      "cloudinaryId": "712e7a85785ab17da3f4e3251634d38b"
+    },
+    {
+      "pageId": "page_999_3_1756736711003_o051kl",
+      "pageNumber": 3,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736717/books/999/pages/page_999_3_1756736711003_o051kl.jpg",
+      "publicId": "books/999/pages/page_999_3_1756736711003_o051kl",
+      "cloudinaryId": "6ad3efa6bfaebdc456b301f5c128f1a9"
+    },
+    {
+      "pageId": "page_999_4_1756736711004_90vgym",
+      "pageNumber": 4,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_4_1756736711004_90vgym.jpg",
+      "publicId": "books/999/pages/page_999_4_1756736711004_90vgym",
+      "cloudinaryId": "e42144472c80283bb11fd74d3e7cee35"
+    },
+    {
+      "pageId": "page_999_5_1756736711005_9aofjh",
+      "pageNumber": 5,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_5_1756736711005_9aofjh.jpg",
+      "publicId": "books/999/pages/page_999_5_1756736711005_9aofjh",
+      "cloudinaryId": "0ba0e03439c27dcf0c815c8604852231"
+    },
+    {
+      "pageId": "page_999_6_1756736711007_dp05ps",
+      "pageNumber": 6,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_6_1756736711007_dp05ps.jpg",
+      "publicId": "books/999/pages/page_999_6_1756736711007_dp05ps",
+      "cloudinaryId": "24cf7f6dd0ae316d40d09491e56b4e40"
+    },
+    {
+      "pageId": "page_999_7_1756736711009_34yod2",
+      "pageNumber": 7,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_7_1756736711009_34yod2.jpg",
+      "publicId": "books/999/pages/page_999_7_1756736711009_34yod2",
+      "cloudinaryId": "c4cc2a8405336217c1d42fd194c26534"
+    },
+    {
+      "pageId": "page_999_8_1756736711011_wnis7u",
+      "pageNumber": 8,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_8_1756736711011_wnis7u.jpg",
+      "publicId": "books/999/pages/page_999_8_1756736711011_wnis7u",
+      "cloudinaryId": "0ba431485b0309feb585c84526e734dc"
+    },
+    {
+      "pageId": "page_999_9_1756736711012_q5uedg",
+      "pageNumber": 9,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_9_1756736711012_q5uedg.jpg",
+      "publicId": "books/999/pages/page_999_9_1756736711012_q5uedg",
+      "cloudinaryId": "9715501989d8028a928a129801d371e9"
+    },
+    {
+      "pageId": "page_999_10_1756736711013_gtev6f",
+      "pageNumber": 10,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_10_1756736711013_gtev6f.jpg",
+      "publicId": "books/999/pages/page_999_10_1756736711013_gtev6f",
+      "cloudinaryId": "076da8b391375fe380af45fbb6d247cb"
+    },
+    {
+      "pageId": "page_999_11_1756736711014_ovvzfy",
+      "pageNumber": 11,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_11_1756736711014_ovvzfy.jpg",
+      "publicId": "books/999/pages/page_999_11_1756736711014_ovvzfy",
+      "cloudinaryId": "43535d8a0970bfb95cb4a87af6a97785"
+    },
+    {
+      "pageId": "page_999_12_1756736711015_s532v8",
+      "pageNumber": 12,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_12_1756736711015_s532v8.jpg",
+      "publicId": "books/999/pages/page_999_12_1756736711015_s532v8",
+      "cloudinaryId": "2cf7e90c5770b54a7b9089c805449a90"
+    },
+    {
+      "pageId": "page_999_13_1756736711016_en61sf",
+      "pageNumber": 13,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_13_1756736711016_en61sf.jpg",
+      "publicId": "books/999/pages/page_999_13_1756736711016_en61sf",
+      "cloudinaryId": "fd3ac2c7f446d364701b9f1b6055998a"
+    },
+    {
+      "pageId": "page_999_14_1756736711017_jnbfqn",
+      "pageNumber": 14,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_14_1756736711017_jnbfqn.jpg",
+      "publicId": "books/999/pages/page_999_14_1756736711017_jnbfqn",
+      "cloudinaryId": "95948df3e9892069216f4ec0b9797598"
+    },
+    {
+      "pageId": "page_999_15_1756736711018_kezbfk",
+      "pageNumber": 15,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_15_1756736711018_kezbfk.jpg",
+      "publicId": "books/999/pages/page_999_15_1756736711018_kezbfk",
+      "cloudinaryId": "53cb3ec883d40e19bcda3e2e7359cce9"
+    },
+    {
+      "pageId": "page_999_16_1756736711019_1dfi2h",
+      "pageNumber": 16,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_16_1756736711019_1dfi2h.jpg",
+      "publicId": "books/999/pages/page_999_16_1756736711019_1dfi2h",
+      "cloudinaryId": "293d772e001ac62ae078a5f72b2fc103"
+    },
+    {
+      "pageId": "page_999_17_1756736711021_t36r65",
+      "pageNumber": 17,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736717/books/999/pages/page_999_17_1756736711021_t36r65.jpg",
+      "publicId": "books/999/pages/page_999_17_1756736711021_t36r65",
+      "cloudinaryId": "ae44513724b7d06fad1a15c2d91ae435"
+    },
+    {
+      "pageId": "page_999_18_1756736711025_ccm2ez",
+      "pageNumber": 18,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_18_1756736711025_ccm2ez.jpg",
+      "publicId": "books/999/pages/page_999_18_1756736711025_ccm2ez",
+      "cloudinaryId": "0ef32bba0351d87af3c99c0e27cec5fd"
+    },
+    {
+      "pageId": "page_999_19_1756736711027_txmm9d",
+      "pageNumber": 19,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_19_1756736711027_txmm9d.jpg",
+      "publicId": "books/999/pages/page_999_19_1756736711027_txmm9d",
+      "cloudinaryId": "8e4ce85c3f6ee0daeef66171b580b1b1"
+    },
+    {
+      "pageId": "page_999_20_1756736711030_5dqz4y",
+      "pageNumber": 20,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_20_1756736711030_5dqz4y.jpg",
+      "publicId": "books/999/pages/page_999_20_1756736711030_5dqz4y",
+      "cloudinaryId": "5a87dadd12262d1b7bd873322811b76d"
+    },
+    {
+      "pageId": "page_999_21_1756736711033_qm7twz",
+      "pageNumber": 21,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736717/books/999/pages/page_999_21_1756736711033_qm7twz.jpg",
+      "publicId": "books/999/pages/page_999_21_1756736711033_qm7twz",
+      "cloudinaryId": "ba4e9078d4b79495e68fddabe4428e7c"
+    },
+    {
+      "pageId": "page_999_22_1756736711036_nj01bz",
+      "pageNumber": 22,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_22_1756736711036_nj01bz.jpg",
+      "publicId": "books/999/pages/page_999_22_1756736711036_nj01bz",
+      "cloudinaryId": "9f805c02dee43fbdcd8b826f3c5aa818"
+    },
+    {
+      "pageId": "page_999_23_1756736711037_mz5y8h",
+      "pageNumber": 23,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_23_1756736711037_mz5y8h.jpg",
+      "publicId": "books/999/pages/page_999_23_1756736711037_mz5y8h",
+      "cloudinaryId": "bb4dd4395eb7221c0a0239d603887d70"
+    },
+    {
+      "pageId": "page_999_24_1756736711039_391jwe",
+      "pageNumber": 24,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_24_1756736711039_391jwe.jpg",
+      "publicId": "books/999/pages/page_999_24_1756736711039_391jwe",
+      "cloudinaryId": "4ab2cce8f48bc3d099e9b47b90b60241"
+    },
+    {
+      "pageId": "page_999_25_1756736711042_c21omu",
+      "pageNumber": 25,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_25_1756736711042_c21omu.jpg",
+      "publicId": "books/999/pages/page_999_25_1756736711042_c21omu",
+      "cloudinaryId": "f6faec1597086b956b854b1c8f6c467d"
+    },
+    {
+      "pageId": "page_999_26_1756736711045_n9t48a",
+      "pageNumber": 26,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_26_1756736711045_n9t48a.jpg",
+      "publicId": "books/999/pages/page_999_26_1756736711045_n9t48a",
+      "cloudinaryId": "101f978682439916ccb0317d2ba450c5"
+    },
+    {
+      "pageId": "page_999_27_1756736711048_1j445o",
+      "pageNumber": 27,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_27_1756736711048_1j445o.jpg",
+      "publicId": "books/999/pages/page_999_27_1756736711048_1j445o",
+      "cloudinaryId": "c60f3a2eb5e6e30c4a98f7b364be0b51"
+    },
+    {
+      "pageId": "page_999_28_1756736711051_z89x52",
+      "pageNumber": 28,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_28_1756736711051_z89x52.jpg",
+      "publicId": "books/999/pages/page_999_28_1756736711051_z89x52",
+      "cloudinaryId": "63c4c167322f494b129c9d234518303a"
+    },
+    {
+      "pageId": "page_999_29_1756736711053_wpjc24",
+      "pageNumber": 29,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_29_1756736711053_wpjc24.jpg",
+      "publicId": "books/999/pages/page_999_29_1756736711053_wpjc24",
+      "cloudinaryId": "2b34e9335b2d774030d98d42b2f7fd53"
+    },
+    {
+      "pageId": "page_999_30_1756736711054_d4bqvh",
+      "pageNumber": 30,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_30_1756736711054_d4bqvh.jpg",
+      "publicId": "books/999/pages/page_999_30_1756736711054_d4bqvh",
+      "cloudinaryId": "432f23319ce7e8718640a5ee10042630"
+    },
+    {
+      "pageId": "page_999_31_1756736711055_12sreb",
+      "pageNumber": 31,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_31_1756736711055_12sreb.jpg",
+      "publicId": "books/999/pages/page_999_31_1756736711055_12sreb",
+      "cloudinaryId": "b4403ee66a226867704e906618b7e636"
+    },
+    {
+      "pageId": "page_999_32_1756736711056_urfbqe",
+      "pageNumber": 32,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_32_1756736711056_urfbqe.jpg",
+      "publicId": "books/999/pages/page_999_32_1756736711056_urfbqe",
+      "cloudinaryId": "af8d4b6984a807649507848f2bf66b08"
+    },
+    {
+      "pageId": "page_999_33_1756736711057_khbrmq",
+      "pageNumber": 33,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_33_1756736711057_khbrmq.jpg",
+      "publicId": "books/999/pages/page_999_33_1756736711057_khbrmq",
+      "cloudinaryId": "23d1be97bb64e7595a9e84b216038b7b"
+    },
+    {
+      "pageId": "page_999_34_1756736711058_6yocpt",
+      "pageNumber": 34,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736716/books/999/pages/page_999_34_1756736711058_6yocpt.jpg",
+      "publicId": "books/999/pages/page_999_34_1756736711058_6yocpt",
+      "cloudinaryId": "a31a6a9afee136c5c600ab2c7ed09d58"
+    },
+    {
+      "pageId": "page_999_35_1756736711059_z7i2m4",
+      "pageNumber": 35,
+      "pageURL": "https://res.cloudinary.com/dkwjobljf/image/upload/v1756736715/books/999/pages/page_999_35_1756736711059_z7i2m4.jpg",
+      "publicId": "books/999/pages/page_999_35_1756736711059_z7i2m4",
+      "cloudinaryId": "6f0fba7ff876e5c6a911f46078889c56"
+    }
+  ],
+  "originalPdfPublicId": "books/1756736692399/sample_zxlhg8",
+  "originalPdfVersion": 1756736698
+}
