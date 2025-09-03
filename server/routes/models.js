@@ -44,7 +44,7 @@ const sql = postgres(DATABASE_URL, {
  *       500:
  *         description: Internal server error
  */
-router.post("/", authenticateToken, async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { ModelName, Description } = req.body;
 
@@ -102,7 +102,7 @@ router.post("/", authenticateToken, async (req, res) => {
  *       500:
  *         description: Internal server error
  */
-router.get("/", authenticateToken, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     console.log(`🔍 Fetching all models`);
 
@@ -156,7 +156,7 @@ router.get("/", authenticateToken, async (req, res) => {
  *       500:
  *         description: Internal server error
  */
-router.get("/:modelId", authenticateToken, async (req, res) => {
+router.get("/:modelId", async (req, res) => {
   try {
     const { modelId } = req.params;
 
@@ -230,7 +230,7 @@ router.get("/:modelId", authenticateToken, async (req, res) => {
  *       500:
  *         description: Internal server error
  */
-router.put("/:modelId", authenticateToken, async (req, res) => {
+router.put("/:modelId", async (req, res) => {
   try {
     const { modelId } = req.params;
     const { ModelName, Description } = req.body;
@@ -302,7 +302,7 @@ router.put("/:modelId", authenticateToken, async (req, res) => {
  *       500:
  *         description: Internal server error
  */
-router.delete("/:modelId", authenticateToken, async (req, res) => {
+router.delete("/:modelId", async (req, res) => {
   try {
     const { modelId } = req.params;
 

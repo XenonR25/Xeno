@@ -1,0 +1,141 @@
+{
+  "quizId": "6",
+  "questions": [
+    {
+      "questionId": "31",
+      "question": "What is the main objective of the double diamond phase mentioned?",
+      "options": {
+        "A": "To generate a problem statement",
+        "B": "To create a design brief",
+        "C": "To create user requirements",
+        "D": "All of the above"
+      },
+      "correctAnswer": "D",
+      "explanation": "The double diamond phase aims to synthesize insights into a clear problem statement and user requirements which would ultimately result in a design brief.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "32",
+      "question": "What is the method followed in the double diamond phase?",
+      "options": {
+        "A": "Problem statement; Persona, Journey mapping",
+        "B": "Synthesize data; Persona, Journey mapping",
+        "C": "Synthesize data; Problem statement; Persona, Journey mapping",
+        "D": "Problem statement; Synthesize data; Persona, Journey mapping"
+      },
+      "correctAnswer": "C",
+      "explanation": "The method involves synthesizing data into a problem statement and persona, journey mapping into user requirements.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "33",
+      "question": "What is the final outcome of the double diamond phase?",
+      "options": {
+        "A": "A problem statement",
+        "B": "A design brief",
+        "C": "User requirements",
+        "D": "User journey map"
+      },
+      "correctAnswer": "B",
+      "explanation": "The final outcome of the double diamond phase is a design brief that provides a focused direction for developing solutions.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "34",
+      "question": "What is the desired picture in the first page about?",
+      "options": {
+        "A": "A portrait of a painter",
+        "B": "A portrait of a species the painter is",
+        "C": "A picture of the pacific northwest",
+        "D": "All of the above"
+      },
+      "correctAnswer": "B",
+      "explanation": "The desired picture is about a painter who is painting a portrait of what species the painter is.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "35",
+      "question": "What does the painter in the first page draw his inspiration from?",
+      "options": {
+        "A": "From a single individual of his species",
+        "B": "From multiple individuals of his species",
+        "C": "From the pacific northwest landscape",
+        "D": "From cute and out of the world pictures"
+      },
+      "correctAnswer": "B",
+      "explanation": "The painter draws his inspiration from many individuals of his species sitting in front of him.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "36",
+      "question": "What class tools are used in the Double Diamond phase?",
+      "options": {
+        "A": "Thematic Analysis, Personas, Journey maps",
+        "B": "Problem statement, Personas, User requirements",
+        "C": "Design brief, Personas, Journey maps",
+        "D": "Thematic Analysis, Problem statement, User requirements"
+      },
+      "correctAnswer": "A",
+      "explanation": "Thematic Analysis, Personas, and Journey maps are the class tools used in the Double Diamond phase.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "37",
+      "question": "What is the relevance of the picture to be created according to the first page?",
+      "options": {
+        "A": "About a painter",
+        "B": "Relevant to pacific northwest",
+        "C": "Is cute and out of the world",
+        "D": "All of the above"
+      },
+      "correctAnswer": "D",
+      "explanation": "The picture to be created is about a painter, is relevant to the pacific northwest, and should be cute and out of the world.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "38",
+      "question": "What type of analysis is used in the Double Diamond phase?",
+      "options": {
+        "A": "Persona Analysis",
+        "B": "Thematic Analysis",
+        "C": "Journey Mapping",
+        "D": "User Requirement Analysis"
+      },
+      "correctAnswer": "B",
+      "explanation": "Thematic Analysis is used in the Double Diamond phase.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "39",
+      "question": "What does the painter in the first page is painting?",
+      "options": {
+        "A": "A landscape",
+        "B": "A self-portrait",
+        "C": "A portrait of another species",
+        "D": "A portrait of the species the painter is"
+      },
+      "correctAnswer": "D",
+      "explanation": "The painter is painting a portrait of the species the painter is.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "40",
+      "question": "What is the picture in the first page supposed to be?",
+      "options": {
+        "A": "Out of the world",
+        "B": "Cute",
+        "C": "Relevant to pacific northwest",
+        "D": "All of the above"
+      },
+      "correctAnswer": "D",
+      "explanation": "The picture is supposed to be out of the world, cute, and relevant to the pacific northwest.",
+      "myAnswer": null
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-09-03T16:46:53.458Z",
+    "totalQuestions": 10,
+    "difficulty": "medium",
+    "generatedBy": "AI"
+  }
+}

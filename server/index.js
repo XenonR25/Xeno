@@ -27,6 +27,7 @@ const userRoutes = require("./routes/users.js");
 const bookRoutes = require("./routes/books.js");
 const bookDetailsRoutes = require("./routes/bookDetails.js");
 const modelRoutes = require("./routes/models.js");
+const quizRoutes = require("./routes/quizzes.js");
 
 // Swagger documentation
 app.use(
@@ -43,6 +44,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/books", bookDetailsRoutes);
 app.use("/api/models", modelRoutes);
+app.use("/api/quizzes", quizRoutes);
 
 // Database connection function
 async function connectToDatabase() {
@@ -116,6 +118,7 @@ app.get("/", async (req, res) => {
         dbTest: "/api/db-test",
         users: "/api/users",
         books: "/api/books",
+        quizzes: "/api/quizzes",
         docs: "/api-docs",
       },
     });
@@ -132,6 +135,7 @@ app.get("/", async (req, res) => {
         dbTest: "/api/db-test",
         users: "/api/users",
         books: "/api/books",
+        quizzes: "/api/quizzes",
         docs: "/api-docs",
       },
     });

@@ -80,6 +80,7 @@
 * updated\_at (timestamp)
 * Difficulty (varchar)
 * Pages (json)
+* UserId (int8, foreign key → User.UserId)
 
 ---
 

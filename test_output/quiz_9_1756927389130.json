@@ -1,0 +1,37 @@
+{
+  "quiz": {
+    "quizId": "9",
+    "difficulty": "easy",
+    "pages": [
+      {
+        "pageId": "page_9_1_1756746712183_mmkmmk",
+        "pageNumber": "1",
+        "bookTitle": "Unknown",
+        "bookId": "9"
+      },
+      {
+        "pageId": "page_9_2_1756746712185_cf1yv5",
+        "pageNumber": "2",
+        "bookTitle": "Unknown",
+        "bookId": "9"
+      },
+      {
+        "pageId": "page_9_3_1756746712187_0xzyp1",
+        "pageNumber": "3",
+        "bookTitle": "Unknown",
+        "bookId": "9"
+      }
+    ],
+    "userId": "1",
+    "userName": "nafi",
+    "createdAt": "2025-09-03T19:22:40.734Z",
+    "score": 0
+  },
+  "metadata": {
+    "timestamp": "2025-09-03T19:23:09.130Z",
+    "totalPages": 3,
+    "successfulOCR": 3,
+    "totalCharacters": 858,
+    "testType": "quiz_generation_api"
+  }
+}

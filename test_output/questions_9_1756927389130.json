@@ -1,0 +1,154 @@
+{
+  "quizId": "9",
+  "questions": [
+    {
+      "questionId": "61",
+      "question": "What is the painter in the story supposed to create?",
+      "options": {
+        "A": "A portrait of a particular species",
+        "B": "A landscape of the pacific northwest",
+        "C": "A self-portrait",
+        "D": "An abstract painting"
+      },
+      "correctAnswer": "A",
+      "explanation": "The content mentions that the painter is painting a portrait of the species he is.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "62",
+      "question": "From where does the painter draw his inspiration?",
+      "options": {
+        "A": "From the nature",
+        "B": "From the individuals sitting in front of him",
+        "C": "From his imagination",
+        "D": "From other paintings"
+      },
+      "correctAnswer": "B",
+      "explanation": "The content specifies that the painter draws his inspiration from the individuals sitting in front of him.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "63",
+      "question": "What is the objective of the 'Define' phase in the double diamond model?",
+      "options": {
+        "A": "To implement the solution",
+        "B": "To define the problems",
+        "C": "To synthesize insights into a clear problem statement and user requirements",
+        "D": "To gather data"
+      },
+      "correctAnswer": "C",
+      "explanation": "Based on the content, the 'Define' phase's objective is to synthesize insights into a clear problem statement and user requirements.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "64",
+      "question": "What is the method followed in the 'Define' phase of the double diamond model?",
+      "options": {
+        "A": "Synthesize data -> Problem statement; Persona, Journey mapping -> User requirements",
+        "B": "Collect data -> Problem statement; Persona, Journey mapping -> User requirements",
+        "C": "Analyze data -> Problem statement; Persona, Journey mapping -> User requirements",
+        "D": "Interpret data -> Problem statement; Persona, Journey mapping -> User requirements"
+      },
+      "correctAnswer": "A",
+      "explanation": "The content explains that the method in the 'Define' phase is to synthesize data into a problem statement and user requirements.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "65",
+      "question": "What is the outcome of the 'Define' phase in the double diamond model?",
+      "options": {
+        "A": "A design brief that provides a focused direction for developing solutions",
+        "B": "A detailed project plan",
+        "C": "A set of potential solutions",
+        "D": "A list of identified problems"
+      },
+      "correctAnswer": "A",
+      "explanation": "The content indicates that the outcome of the 'Define' phase is a design brief that provides a focused direction for developing solutions.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "66",
+      "question": "What does the 'Define' phase use for the process?",
+      "options": {
+        "A": "Thematic Analysis, Personas, Journey maps",
+        "B": "Data Collection, Personas, Journey maps",
+        "C": "Data Analysis, Personas, Journey maps",
+        "D": "Data Interpretation, Personas, Journey maps"
+      },
+      "correctAnswer": "A",
+      "explanation": "The content mentions that Thematic Analysis, Personas, Journey maps are used in the 'Define' phase.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "67",
+      "question": "What is the picture that the painter is creating supposed to be?",
+      "options": {
+        "A": "Ugly",
+        "B": "Scary",
+        "C": "Cute",
+        "D": "Sad"
+      },
+      "correctAnswer": "C",
+      "explanation": "The content mentions that the painter is supposed to create a picture that is cute.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "68",
+      "question": "Where is the picture that the painter is creating supposed to be relevant to?",
+      "options": {
+        "A": "Pacific northwest",
+        "B": "Southern hemisphere",
+        "C": "Eastern seaboard",
+        "D": "Midwest"
+      },
+      "correctAnswer": "A",
+      "explanation": "The content mentions that the picture is supposed to be relevant to the pacific northwest.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "69",
+      "question": "Who is the painter painting a portrait of?",
+      "options": {
+        "A": "A famous individual",
+        "B": "What species the painter is",
+        "C": "A group of animals",
+        "D": "A beautiful landscape"
+      },
+      "correctAnswer": "B",
+      "explanation": "The content mentions that the painter is painting a portrait of what species the painter is.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "70",
+      "question": "Who is sitting in front of the painter?",
+      "options": {
+        "A": "Many individuals of the same species as the painter",
+        "B": "A single individual",
+        "C": "Numerous famous people",
+        "D": "A group of animals"
+      },
+      "correctAnswer": "A",
+      "explanation": "The content mentions that there are many individuals of the same species as the painter sitting in front of him.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "71",
+      "question": "What is the picture that the painter is creating supposed to be about?",
+      "options": {
+        "A": "A painter painting a portrait of what species the painter is",
+        "B": "A painter painting a landscape",
+        "C": "A painter painting a self-portrait",
+        "D": "A painter painting an abstract work"
+      },
+      "correctAnswer": "A",
+      "explanation": "The content mentions that the picture is supposed to be about a painter who is painting a portrait of what species the painter is.",
+      "myAnswer": null
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-09-03T19:23:09.130Z",
+    "totalQuestions": 11,
+    "difficulty": "easy",
+    "generatedBy": "AI"
+  }
+}

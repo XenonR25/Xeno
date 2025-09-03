@@ -1,0 +1,141 @@
+{
+  "quizId": "7",
+  "questions": [
+    {
+      "questionId": "41",
+      "question": "What is the objective of the 'Define' phase in the Double Diamond method?",
+      "options": {
+        "A": "To generate multiple design ideas",
+        "B": "To synthesize insights into a clear problem statement and user requirements",
+        "C": "To create a design brief",
+        "D": "To map the user journey"
+      },
+      "correctAnswer": "B",
+      "explanation": "The 'Define' phase in the Double Diamond method aims at synthesizing insights into a clear problem statement and user requirements.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "42",
+      "question": "Which of the following is not an outcome of the 'Define' phase of the Double Diamond method?",
+      "options": {
+        "A": "Design brief",
+        "B": "Problem statement",
+        "C": "User requirements",
+        "D": "Thematic Analysis"
+      },
+      "correctAnswer": "D",
+      "explanation": "Thematic Analysis is a method used in the 'Define' phase, not an outcome.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "43",
+      "question": "What does 'Contextual Inquiry' contribute to in 'Actions, Mindsets, and Emotions'?",
+      "options": {
+        "A": "Narrative of the steps",
+        "B": "Users’ thoughts, questions, motivations, and information needs",
+        "C": "Journey phases of the delights and frustration",
+        "D": "Persona development"
+      },
+      "correctAnswer": "B",
+      "explanation": "The 'Contextual Inquiry' contributes to understanding users’ thoughts, questions, motivations, and information needs.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "44",
+      "question": "Which of the following is depicted as a single line across the journey phases in 'Actions, Mindsets, and Emotions'?",
+      "options": {
+        "A": "Narrative of the steps",
+        "B": "User requirements",
+        "C": "Delights and frustration",
+        "D": "Problem statement"
+      },
+      "correctAnswer": "C",
+      "explanation": "Emotions are depicted as a single line across the journey phases, representing the delights and frustrations.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "45",
+      "question": "What method leads to the creation of a problem statement in the 'Define' phase of the Double Diamond method?",
+      "options": {
+        "A": "Thematic Analysis",
+        "B": "Persona",
+        "C": "Journey mapping",
+        "D": "Synthesizing data"
+      },
+      "correctAnswer": "D",
+      "explanation": "Synthesizing data leads to the creation of a problem statement.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "46",
+      "question": "What is the product of Journey mapping in the 'Define' phase of the Double Diamond method?",
+      "options": {
+        "A": "Design brief",
+        "B": "User requirements",
+        "C": "Problem statement",
+        "D": "Thematic Analysis"
+      },
+      "correctAnswer": "B",
+      "explanation": "Journey mapping leads to the definition of user requirements.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "47",
+      "question": "What is the purpose of a design brief in the 'Define' phase of the Double Diamond method?",
+      "options": {
+        "A": "To define user requirements",
+        "B": "To provide a focused direction for developing solutions",
+        "C": "To synthesize data into problem statement",
+        "D": "To map user journey"
+      },
+      "correctAnswer": "B",
+      "explanation": "A design brief is the outcome of the 'Define' phase and provides a focused direction for developing solutions.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "48",
+      "question": "What types of information are captured in 'Mindsets' during 'Actions, Mindsets, and Emotions' analysis?",
+      "options": {
+        "A": "Users' steps throughout their journey",
+        "B": "Users' delights and frustrations",
+        "C": "Users' thoughts, questions, motivations, and information needs",
+        "D": "Users' personal background and lifestyle"
+      },
+      "correctAnswer": "C",
+      "explanation": "'Mindsets' capture users’ thoughts, questions, motivations, and information needs.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "49",
+      "question": "What type of user information is derived from Contextual Inquiry?",
+      "options": {
+        "A": "Problem statements",
+        "B": "Design briefs",
+        "C": "Users' thoughts, questions, motivations, and information needs",
+        "D": "User journey maps"
+      },
+      "correctAnswer": "C",
+      "explanation": "Contextual Inquiry provides insights into users’ thoughts, questions, motivations, and information needs.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "50",
+      "question": "What is represented by emotions in the 'Actions, Mindsets, and Emotions' section?",
+      "options": {
+        "A": "The steps taken by users",
+        "B": "The delights and frustrations of users",
+        "C": "Users' thoughts, questions, motivations, and information needs",
+        "D": "The problem statement"
+      },
+      "correctAnswer": "B",
+      "explanation": "Emotions represent the delights and frustrations of users.",
+      "myAnswer": null
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-09-03T17:49:42.281Z",
+    "totalQuestions": 10,
+    "difficulty": "medium",
+    "generatedBy": "AI"
+  }
+}

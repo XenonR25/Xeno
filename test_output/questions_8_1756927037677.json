@@ -1,0 +1,141 @@
+{
+  "quizId": "8",
+  "questions": [
+    {
+      "questionId": "51",
+      "question": "What is the painter in the story required to create?",
+      "options": {
+        "A": "An out of the world picture",
+        "B": "A sculpture",
+        "C": "A mural",
+        "D": "A sketch"
+      },
+      "correctAnswer": "A",
+      "explanation": "The text directly states that the painter is to 'Create an out of the world picture.'",
+      "myAnswer": null
+    },
+    {
+      "questionId": "52",
+      "question": "What is the subject of the painter's portrait?",
+      "options": {
+        "A": "A landscape",
+        "B": "The species the painter belongs to",
+        "C": "The painter's self-portrait",
+        "D": "An abstract concept"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text says that the painter is painting a portrait of what species the painter is.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "53",
+      "question": "Where is the painting supposed to be relevant to?",
+      "options": {
+        "A": "Pacific Northwest",
+        "B": "East Coast",
+        "C": "Southwest",
+        "D": "Midwest"
+      },
+      "correctAnswer": "A",
+      "explanation": "The text mentions that the picture is relevant to the Pacific Northwest.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "54",
+      "question": "What is the objective of the 'Define' phase in the Double Diamond model?",
+      "options": {
+        "A": "Develop solutions",
+        "B": "Synthesize insights into a clear problem statement and user requirements",
+        "C": "Generate a design brief",
+        "D": "Create personas and journey maps"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text states that the objective of the 'Define' phase is to 'Synthesize insights into clear problem statement and user requirements.'",
+      "myAnswer": null
+    },
+    {
+      "questionId": "55",
+      "question": "What are the methods used in the 'Define' phase?",
+      "options": {
+        "A": "Thematic Analysis, Personas, Journey maps",
+        "B": "Synthesize data, Problem statement, Persona, Journey mapping",
+        "C": "Developing solutions",
+        "D": "Creating a design brief"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text mentions 'Synthesize data -> Problem statement; Persona, Journey mapping' as the methods used in the 'Define' phase.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "56",
+      "question": "What is the outcome of the 'Define' phase?",
+      "options": {
+        "A": "A design brief providing focused direction for developing solutions",
+        "B": "A finalized solution",
+        "C": "A journey map",
+        "D": "A persona"
+      },
+      "correctAnswer": "A",
+      "explanation": "The text states that the outcome of the 'Define' phase is a 'design brief that provides a focused direction for developing solutions.'",
+      "myAnswer": null
+    },
+    {
+      "questionId": "57",
+      "question": "What class is mentioned in the 'Define' phase?",
+      "options": {
+        "A": "Thematic Analysis, Personas, Journey maps",
+        "B": "Design Thinking",
+        "C": "Product Design",
+        "D": "User Experience Design"
+      },
+      "correctAnswer": "A",
+      "explanation": "The text mentions 'Thematic Analysis, Personas, Journey maps' as the class in the 'Define' phase.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "58",
+      "question": "What does the painter draw his inspiration from?",
+      "options": {
+        "A": "The landscape",
+        "B": "His imagination",
+        "C": "The individuals of his species sitting in front of him",
+        "D": "Famous artworks"
+      },
+      "correctAnswer": "C",
+      "explanation": "The text mentions that the painter draws his inspiration from the individuals of his species sitting in front of him.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "59",
+      "question": "How is the picture that the painter is creating described?",
+      "options": {
+        "A": "Bland and irrelevant",
+        "B": "Cute and relevant to Pacific Northwest",
+        "C": "Abstract and complex",
+        "D": "Dark and gloomy"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text describes the picture as 'cute, relevant to pacific northwest.'",
+      "myAnswer": null
+    },
+    {
+      "questionId": "60",
+      "question": "What does the 'Define' phase in the Double Diamond model involve?",
+      "options": {
+        "A": "Developing solutions",
+        "B": "Defining user requirements",
+        "C": "Creating a design brief",
+        "D": "All of the above"
+      },
+      "correctAnswer": "D",
+      "explanation": "The 'Define' phase involves synthesizing insights into a clear problem statement and user requirements, and the outcome is a design brief that provides a focused direction for developing solutions.",
+      "myAnswer": null
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-09-03T19:17:17.678Z",
+    "totalQuestions": 10,
+    "difficulty": "easy",
+    "generatedBy": "AI"
+  }
+}

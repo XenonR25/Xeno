@@ -91,7 +91,7 @@ async function callOpenAI(context, prompt) {
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant that provides detailed explanations based on the given context."
+          content: "You are a helpful assistant that provides detailed Responses based on the given context."
         },
         {
           role: "user",
@@ -184,7 +184,7 @@ async function callDeepSeek(context, prompt) {
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant that provides detailed explanations based on the given context."
+          content: "You are a helpful assistant that provides detailed Responses based on the given context."
         },
         {
           role: "user",
@@ -398,13 +398,13 @@ async function runComprehensiveTest() {
   }
 }
 
-// Test OpenAI explanation generation
+// Test OpenAI Response generation
 async function testOpenAIExplanation() {
   console.log('\n🧪 ========== OPENAI EXPLANATION TEST ==========');
   
   const testResults = {
     timestamp: new Date().toISOString(),
-    test_type: 'openai_explanation_generation',
+    test_type: 'openai_Response_generation',
     model: 'OpenAI',
     api_key_status: OPENAI_API_KEY ? 'Available' : 'Missing',
     hardcoded_values: {},
@@ -422,8 +422,425 @@ async function testOpenAIExplanation() {
       throw new Error('OPENAI_API_KEY is not configured');
     }
 
-    // Hardcoded test values for OpenAI
-    const HARDCODED_CATEGORY_ID = 1; // Change this to a category with OpenAI model
+    // First, let's check what categories and models exist, and create them if needed
+    console.log('🔍 Checking existing categories and models...');
+    
+    // Check if OpenAI model exists
+    let openaiModel = await sql`
+      SELECT "ModelId", "ModelName" FROM "Model" 
+      WHERE LOWER("ModelName") LIKE '%openai%' OR LOWER("ModelName") LIKE '%gpt%'
+      LIMIT 1
+    `;
+    
+    if (openaiModel.length === 0) {
+      console.log('📝 Creating OpenAI model...');
+      openaiModel = await sql`
+        INSERT INTO "Model" ("ModelName", "Description")
+        VALUES ('OpenAI GPT-4', 'OpenAI GPT-4 language model for text generation')
+        RETURNING "ModelId", "ModelName"
+      `;
+      console.log(`✅ Created OpenAI model: ${openaiModel[0].ModelName}`);
+    } else {
+      console.log(`✅ Found existing OpenAI model: ${openaiModel[0].ModelName}`);
+    }
+
+    // Check if prompt exists
+    let prompt = await sql`
+      SELECT "PromptId", "Prompt" FROM "Prompting" 
+      LIMIT 1
+    `;
+    
+    if (prompt.length === 0) {
+      console.log('📝 Creating test prompt...');
+      prompt = await sql`
+        INSERT INTO "Prompting" ("Prompt")
+        VALUES ('Analyze and explain the content from the provided pages. Focus on key concepts and provide clear Responses.')
+        RETURNING "PromptId", "Prompt"
+      `;
+      console.log(`✅ Created test prompt`);
+    } else {
+      console.log(`✅ Found existing prompt`);
+    }
+
+    // Check if category exists with OpenAI model
+    let category = await sql`
+      SELECT c."CategoryId", c."Name", m."ModelName", p."Prompt"
+      FROM "Category" c
+      JOIN "Model" m ON c."ModelId" = m."ModelId"
+      JOIN "Prompting" p ON c."PromptId" = p."PromptId"
+      WHERE m."ModelId" = ${openaiModel[0].ModelId}
+      LIMIT 1
+    `;
+    
+    if (category.length === 0) {
+      console.log('📝 Creating test category with OpenAI model...');
+      category = await sql`
+        INSERT INTO "Category" ("Name", "Description", "ModelId", "PromptId")
+        VALUES ('OpenAI Test Category', 'Test category for OpenAI Responses', ${openaiModel[0].ModelId}, ${prompt[0].PromptId})
+        RETURNING "CategoryId", "Name"
+      `;
+      console.log(`✅ Created test category: ${category[0].Name}`);
+      
+      // Fetch the complete category info
+      category = await sql`
+        SELECT c."CategoryId", c."Name", c."Description", m."ModelName", p."Prompt"
+        FROM "Category" c
+        JOIN "Model" m ON c."ModelId" = m."ModelId"
+        JOIN "Prompting" p ON c."PromptId" = p."PromptId"
+        WHERE c."CategoryId" = ${category[0].CategoryId}
+      `;
+    } else {
+      console.log(`✅ Found existing OpenAI category: ${category[0].Name}`);
+    }
+
+    // Use the found/created category ID
+    const HARDCODED_CATEGORY_ID = category[0].CategoryId;
+    
+    // Check what pages exist in the database
+    console.log('🔍 Checking existing pages in database...');
+    const existingPages = await sql`
+      SELECT "PageId", "pageNumber", b."Name" as book_title
+      FROM "Pages" p
+      JOIN "Books" b ON p."BookId" = b."BookId"
+      ORDER BY "PageId"
+      LIMIT 10
+    `;
+    
+    let HARDCODED_PAGE_IDS;
+    if (existingPages.length >= 3) {
+      HARDCODED_PAGE_IDS = existingPages.slice(0, 3).map(p => p.PageId);
+      console.log(`✅ Found ${existingPages.length} existing pages, using first 3: [${HARDCODED_PAGE_IDS.join(', ')}]`);
+      existingPages.slice(0, 3).forEach(page => {
+        console.log(`   📖 Page ${page.pageNumber} from "${page.book_title}" (ID: ${page.PageId})`);
+      });
+    } else if (existingPages.length > 0) {
+      HARDCODED_PAGE_IDS = existingPages.map(p => p.PageId);
+      console.log(`⚠️ Only found ${existingPages.length} pages, using all: [${HARDCODED_PAGE_IDS.join(', ')}]`);
+    } else {
+      console.log('❌ No pages found in database. Creating mock pages for testing...');
+      
+      // Check if any books exist
+      const existingBooks = await sql`
+        SELECT "BookId", "Name" FROM "Books" LIMIT 1
+      `;
+      
+      let bookId;
+      if (existingBooks.length === 0) {
+        console.log('📝 Creating test book...');
+        const testBook = await sql`
+          INSERT INTO "Books" ("Name", "Description", "UserId")
+          VALUES ('Test Book for Explanations', 'A test book for Response testing', 1)
+          RETURNING "BookId", "Name"
+        `;
+        bookId = testBook[0].BookId;
+        console.log(`✅ Created test book: ${testBook[0].Name}`);
+      } else {
+        bookId = existingBooks[0].BookId;
+        console.log(`✅ Using existing book: ${existingBooks[0].Name}`);
+      }
+      
+      // Create test pages
+      console.log('📝 Creating test pages...');
+      const testPages = [];
+      for (let i = 1; i <= 3; i++) {
+        const page = await sql`
+          INSERT INTO "Pages" ("BookId", "pageNumber", "pageURL")
+          VALUES (${bookId}, ${i}, 'https://example.com/test-page-${i}.jpg')
+          RETURNING "PageId", "pageNumber"
+        `;
+        testPages.push(page[0].PageId);
+        console.log(`✅ Created test page ${i}: PageId ${page[0].PageId}`);
+      }
+      HARDCODED_PAGE_IDS = testPages;
+    }
+    
+    testResults.hardcoded_values = {
+      categoryId: HARDCODED_CATEGORY_ID,
+      pageIds: HARDCODED_PAGE_IDS
+    };
+
+    console.log(`📋 Using hardcoded Category ID: ${HARDCODED_CATEGORY_ID}`);
+    console.log(`📄 Using hardcoded Page IDs: [${HARDCODED_PAGE_IDS.join(', ')}]`);
+
+    // Step 1: Use the category we found/created above
+    console.log('\n🔍 Step 1: Using OpenAI category information...');
+    
+    testResults.category_info = category[0];
+    
+    console.log(`✅ OpenAI Category found: ${category[0].Name}`);
+    console.log(`🤖 Model: ${category[0].ModelName}`);
+    console.log(`💭 Prompt: "${category[0].Prompt.substring(0, 100)}..."`);
+
+    // Step 2: Fetch pages by IDs
+    console.log('\n📚 Step 2: Fetching pages by IDs...');
+    const pages = await sql`
+      SELECT p."PageId", p."pageURL", p."pageNumber", b."Name" as book_title, b."BookId"
+      FROM "Pages" p
+      JOIN "Books" b ON p."BookId" = b."BookId"
+      WHERE p."PageId" = ANY(${HARDCODED_PAGE_IDS})
+      ORDER BY b."BookId", p."pageNumber"
+    `;
+
+    if (pages.length === 0) {
+      throw new Error(`No pages found with IDs: [${HARDCODED_PAGE_IDS.join(', ')}]`);
+    }
+
+    testResults.pages_processed = pages.map(p => ({
+      pageId: p.PageId,
+      pageNumber: p.pageNumber,
+      bookTitle: p.book_title,
+      pageURL: p.pageURL
+    }));
+
+    console.log(`✅ Found ${pages.length} pages`);
+    pages.forEach(page => {
+      console.log(`   📖 Page ${page.pageNumber} from "${page.book_title}" (ID: ${page.PageId})`);
+    });
+
+    // Step 3: Process OCR for all pages
+    console.log('\n🔍 Step 3: Processing OCR for all pages...');
+    const ocrResults = [];
+    let combinedContext = '';
+
+    for (const page of pages) {
+      try {
+        console.log(`📄 Processing OCR for Page ${page.pageNumber}...`);
+        const ocrText = await processOCR(page.pageURL);
+        
+        const ocrResult = {
+          pageId: page.PageId,
+          pageNumber: page.pageNumber,
+          success: true,
+          text: ocrText,
+          textLength: ocrText.length
+        };
+        
+        ocrResults.push(ocrResult);
+        combinedContext += `\n--- Page ${page.pageNumber} ---\n${ocrText}\n`;
+        
+        console.log(`✅ OCR completed for Page ${page.pageNumber}: ${ocrText.length} characters`);
+      } catch (error) {
+        console.error(`❌ OCR failed for Page ${page.pageNumber}:`, error.message);
+        ocrResults.push({
+          pageId: page.PageId,
+          pageNumber: page.pageNumber,
+          success: false,
+          error: error.message,
+          text: '',
+          textLength: 0
+        });
+      }
+    }
+
+    testResults.ocr_results = ocrResults;
+    const successfulOCR = ocrResults.filter(r => r.success).length;
+    
+    console.log(`📊 OCR Summary: ${successfulOCR}/${pages.length} pages processed successfully`);
+    console.log(`📝 Total context length: ${combinedContext.length} characters`);
+
+    // Step 4: Test OpenAI API with individual page responses
+    console.log('\n🤖 Step 4: Testing OpenAI API for each page individually...');
+    const aiResponses = {};
+    const individualResponses = [];
+
+    console.log(`🎯 Using OpenAI API for model: ${category[0].ModelName}`);
+
+    // Process each page individually
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i];
+      const ocrResult = ocrResults[i];
+      
+      if (!ocrResult.success) {
+        console.log(`⚠️ Skipping Page ${page.pageNumber} - OCR failed`);
+        individualResponses.push({
+          pageId: page.PageId,
+          pageNumber: page.pageNumber,
+          success: false,
+          error: 'OCR failed for this page',
+          response: null
+        });
+        continue;
+      }
+
+      try {
+        console.log(`🚀 Testing OpenAI API for Page ${page.pageNumber}...`);
+        const pageContext = `Page ${page.pageNumber} content:\n${ocrResult.text}`;
+        const response = await callOpenAI(pageContext, category[0].Prompt);
+        
+        individualResponses.push({
+          pageId: page.PageId,
+          pageNumber: page.pageNumber,
+          success: true,
+          response: response,
+          length: response.length
+        });
+        
+        console.log(`✅ OpenAI API successful for Page ${page.pageNumber}: ${response.length} characters`);
+      } catch (error) {
+        console.error(`❌ OpenAI API failed for Page ${page.pageNumber}:`, error.message);
+        individualResponses.push({
+          pageId: page.PageId,
+          pageNumber: page.pageNumber,
+          success: false,
+          error: error.message,
+          response: null
+        });
+      }
+    }
+
+    const successfulResponses = individualResponses.filter(r => r.success);
+    aiResponses.openai = { 
+      success: successfulResponses.length > 0, 
+      individualResponses: individualResponses,
+      totalPages: pages.length,
+      successfulPages: successfulResponses.length
+    };
+
+    testResults.ai_responses.primary = {
+      api: 'openai',
+      success: successfulResponses.length > 0,
+      individualResponses: individualResponses,
+      totalPages: pages.length,
+      successfulPages: successfulResponses.length
+    };
+
+    console.log(`📊 OpenAI API Summary: ${successfulResponses.length}/${pages.length} pages processed successfully`);
+
+    // Step 5: Store individual responses in database (Explanation table)
+    console.log('\n💾 Step 5: Storing individual responses in database...');
+    const databaseStorage = [];
+
+    for (const responseData of individualResponses) {
+      if (!responseData.success || !responseData.response) {
+        console.log(`⚠️ Skipping database storage for Page ${responseData.pageNumber} - no valid response`);
+        databaseStorage.push({
+          pageId: responseData.pageId,
+          categoryId: HARDCODED_CATEGORY_ID,
+          success: false,
+          error: 'No valid AI response to store'
+        });
+        continue;
+      }
+
+      try {
+        const Response = await sql`
+          INSERT INTO "Explanation" (
+            "PageId",
+            "CategoryId", 
+            "Response"
+          )
+          VALUES (
+            ${responseData.pageId},
+            ${HARDCODED_CATEGORY_ID},
+            ${responseData.response}
+          )
+          RETURNING "ExplanationId", "PageId", "CategoryId", "created_at"
+        `;
+
+        databaseStorage.push({
+          ResponseId: Response[0].ExplanationId,
+          pageId: responseData.pageId,
+          pageNumber: responseData.pageNumber,
+          categoryId: HARDCODED_CATEGORY_ID,
+          success: true,
+          created_at: Response[0].created_at
+        });
+
+        console.log(`✅ Stored individual response for Page ${responseData.pageNumber}: ExplanationId ${Response[0].ExplanationId}`);
+      } catch (error) {
+        console.error(`❌ Failed to store response for Page ${responseData.pageNumber}:`, error.message);
+        databaseStorage.push({
+          pageId: responseData.pageId,
+          pageNumber: responseData.pageNumber,
+          categoryId: HARDCODED_CATEGORY_ID,
+          success: false,
+          error: error.message
+        });
+      }
+    }
+
+    testResults.database_storage = databaseStorage;
+
+    // Step 6: Store in local storage (JSON file)
+    console.log('\n💿 Step 6: Storing OpenAI results in local storage...');
+    const timestamp = Date.now();
+    const filename = `openai_Response_test_${timestamp}.json`;
+    const filepath = path.join(__dirname, '../../test_output', filename);
+
+    testResults.local_storage = {
+      filename,
+      filepath,
+      timestamp
+    };
+
+    // Ensure test_output directory exists
+    const testOutputDir = path.join(__dirname, '../../test_output');
+    if (!fs.existsSync(testOutputDir)) {
+      fs.mkdirSync(testOutputDir, { recursive: true });
+    }
+
+    fs.writeFileSync(filepath, JSON.stringify(testResults, null, 2));
+    console.log(`✅ Test results saved to: ${filename}`);
+
+    // Summary
+    console.log('\n📊 ========== OPENAI TEST SUMMARY ==========');
+    console.log(`🎯 Category: ${category[0].Name} (ID: ${HARDCODED_CATEGORY_ID})`);
+    console.log(`🤖 Model: ${category[0].ModelName}`);
+    console.log(`📄 Pages processed: ${pages.length}`);
+    console.log(`🔍 OCR successful: ${successfulOCR}/${pages.length}`);
+    console.log(`🤖 OpenAI API: ${testResults.ai_responses.primary?.success ? '✅ Success' : '❌ Failed'}`);
+    console.log(`💾 Database storage: ${databaseStorage.filter(d => d.success).length}/${pages.length} successful`);
+    console.log(`💿 Local storage: ✅ Saved to ${filename}`);
+
+    return testResults;
+
+  } catch (error) {
+    console.error('❌ OpenAI Response test failed:', error);
+    testResults.errors.push(error.message);
+    
+    // Still save results even if test failed
+    const timestamp = Date.now();
+    const filename = `openai_Response_test_failed_${timestamp}.json`;
+    const filepath = path.join(__dirname, '../../test_output', filename);
+    
+    const testOutputDir = path.join(__dirname, '../../test_output');
+    if (!fs.existsSync(testOutputDir)) {
+      fs.mkdirSync(testOutputDir, { recursive: true });
+    }
+    
+    fs.writeFileSync(filepath, JSON.stringify(testResults, null, 2));
+    console.log(`💿 Failed test results saved to: ${filename}`);
+    
+    throw error;
+  }
+}
+
+// Test Gemini Response generation
+async function testGeminiExplanation() {
+  console.log('\n🧪 ========== GEMINI EXPLANATION TEST ==========');
+  
+  const testResults = {
+    timestamp: new Date().toISOString(),
+    test_type: 'gemini_Response_generation',
+    model: 'Gemini',
+    api_key_status: GEMINI_API_KEY ? 'Available' : 'Missing',
+    hardcoded_values: {},
+    category_info: {},
+    pages_processed: [],
+    ocr_results: [],
+    ai_responses: {},
+    database_storage: [],
+    local_storage: {},
+    errors: []
+  };
+
+  try {
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY is not configured');
+    }
+
+    // Hardcoded test values for Gemini
+    const HARDCODED_CATEGORY_ID = 2; // Change this to a category with Gemini model
     const HARDCODED_PAGE_IDS = [1, 2, 3]; // Change these to existing page IDs
     
     testResults.hardcoded_values = {
@@ -434,29 +851,30 @@ async function testOpenAIExplanation() {
     console.log(`📋 Using hardcoded Category ID: ${HARDCODED_CATEGORY_ID}`);
     console.log(`📄 Using hardcoded Page IDs: [${HARDCODED_PAGE_IDS.join(', ')}]`);
 
-    // Step 1: Fetch category information with model and prompt
-    console.log('\n🔍 Step 1: Fetching category information...');
+    // Step 1: Fetch category information with Gemini model and prompt
+    console.log('\n🔍 Step 1: Fetching Gemini category information...');
     const categoryInfo = await sql`
       SELECT 
         c."CategoryId",
         c."Name" as "CategoryName",
         c."Description" as "CategoryDescription",
-        m."Name" as "ModelName",
+        m."ModelName" as "ModelName",
         p."Prompt"
       FROM "Category" c
       JOIN "Model" m ON c."ModelId" = m."ModelId"
       JOIN "Prompting" p ON c."PromptId" = p."PromptId"
       WHERE c."CategoryId" = ${HARDCODED_CATEGORY_ID}
+        AND LOWER(m."ModelName") LIKE '%gemini%'
     `;
 
     if (categoryInfo.length === 0) {
-      throw new Error(`Category with ID ${HARDCODED_CATEGORY_ID} not found`);
+      throw new Error(`Gemini category with ID ${HARDCODED_CATEGORY_ID} not found. Make sure the category uses a Gemini model.`);
     }
 
     const category = categoryInfo[0];
     testResults.category_info = category;
     
-    console.log(`✅ Category found: ${category.CategoryName}`);
+    console.log(`✅ Gemini Category found: ${category.CategoryName}`);
     console.log(`🤖 Model: ${category.ModelName}`);
     console.log(`💭 Prompt: "${category.Prompt.substring(0, 100)}..."`);
 
@@ -527,89 +945,50 @@ async function testOpenAIExplanation() {
     console.log(`📊 OCR Summary: ${successfulOCR}/${pages.length} pages processed successfully`);
     console.log(`📝 Total context length: ${combinedContext.length} characters`);
 
-    // Step 4: Test AI APIs with context + prompt
-    console.log('\n🤖 Step 4: Testing AI APIs with context + prompt...');
+    // Step 4: Test Gemini API with context + prompt
+    console.log('\n🤖 Step 4: Testing Gemini API with context + prompt...');
     const aiResponses = {};
 
-    // Determine which API to use based on model name
-    const modelType = category.ModelName.toLowerCase();
-    let primaryAPI = 'openai'; // default
-    
-    if (modelType.includes('gpt') || modelType.includes('chatgpt') || modelType.includes('openai')) {
-      primaryAPI = 'openai';
-    } else if (modelType.includes('gemini')) {
-      primaryAPI = 'gemini';
-    } else if (modelType.includes('deepseek')) {
-      primaryAPI = 'deepseek';
-    }
+    console.log(`🎯 Using Gemini API for model: ${category.ModelName}`);
 
-    console.log(`🎯 Primary API determined: ${primaryAPI} (based on model: ${category.ModelName})`);
-
-    // Test the primary API
+    // Test Gemini API specifically
     try {
-      console.log(`🚀 Testing ${primaryAPI.toUpperCase()} API...`);
-      let response;
-      
-      if (primaryAPI === 'openai' && OPENAI_API_KEY) {
-        response = await callOpenAI(combinedContext, category.Prompt);
-        aiResponses.openai = { success: true, response, length: response.length };
-        console.log(`✅ OpenAI API successful: ${response.length} characters`);
-      } else if (primaryAPI === 'gemini' && GEMINI_API_KEY) {
-        response = await callGemini(combinedContext, category.Prompt);
-        aiResponses.gemini = { success: true, response, length: response.length };
-        console.log(`✅ Gemini API successful: ${response.length} characters`);
-      } else if (primaryAPI === 'deepseek' && DEEPSEEK_API_KEY) {
-        response = await callDeepSeek(combinedContext, category.Prompt);
-        aiResponses.deepseek = { success: true, response, length: response.length };
-        console.log(`✅ DeepSeek API successful: ${response.length} characters`);
-      } else {
-        throw new Error(`API key not available for ${primaryAPI}`);
-      }
+      console.log(`🚀 Testing Gemini API...`);
+      const response = await callGemini(combinedContext, category.Prompt);
+      aiResponses.gemini = { success: true, response, length: response.length };
+      console.log(`✅ Gemini API successful: ${response.length} characters`);
 
       testResults.ai_responses.primary = {
-        api: primaryAPI,
+        api: 'gemini',
         success: true,
         response: response,
         length: response.length
       };
 
     } catch (error) {
-      console.error(`❌ Primary API (${primaryAPI}) failed:`, error.message);
+      console.error(`❌ Gemini API failed:`, error.message);
       testResults.ai_responses.primary = {
-        api: primaryAPI,
+        api: 'gemini',
         success: false,
         error: error.message
       };
-      
-      // Try fallback APIs
-      console.log(`🔄 Trying fallback APIs...`);
-      if (OPENAI_API_KEY && primaryAPI !== 'openai') {
-        try {
-          const response = await callOpenAI(combinedContext, category.Prompt);
-          aiResponses.openai = { success: true, response, length: response.length };
-          testResults.ai_responses.fallback = { api: 'openai', success: true, response, length: response.length };
-          console.log(`✅ Fallback OpenAI successful: ${response.length} characters`);
-        } catch (fallbackError) {
-          aiResponses.openai = { success: false, error: fallbackError.message };
-        }
-      }
+      throw error; // Re-throw since this is specifically a Gemini test
     }
 
     // Step 5: Store responses in database (Explanation table)
-    console.log('\n💾 Step 5: Storing explanations in database...');
+    console.log('\n💾 Step 5: Storing Responses in database...');
     const databaseStorage = [];
     
     const finalResponse = testResults.ai_responses.primary?.response || 
-                         testResults.ai_responses.fallback?.response || 
                          'AI processing failed - no response generated';
 
     for (const page of pages) {
       try {
-        const explanation = await sql`
+        const Response = await sql`
           INSERT INTO "Explanation" (
             "PageId",
             "CategoryId", 
-            "explanation"
+            "Response"
           )
           VALUES (
             ${page.PageId},
@@ -620,16 +999,16 @@ async function testOpenAIExplanation() {
         `;
 
         databaseStorage.push({
-          explanationId: explanation[0].ExplanationId,
+          ResponseId: Response[0].ExplanationId,
           pageId: page.PageId,
           categoryId: HARDCODED_CATEGORY_ID,
           success: true,
-          created_at: explanation[0].created_at
+          created_at: Response[0].created_at
         });
 
-        console.log(`✅ Stored explanation for Page ${page.PageId}: ExplanationId ${explanation[0].ExplanationId}`);
+        console.log(`✅ Stored Response for Page ${page.PageId}: ExplanationId ${Response[0].ExplanationId}`);
       } catch (error) {
-        console.error(`❌ Failed to store explanation for Page ${page.PageId}:`, error.message);
+        console.error(`❌ Failed to store Response for Page ${page.PageId}:`, error.message);
         databaseStorage.push({
           pageId: page.PageId,
           categoryId: HARDCODED_CATEGORY_ID,
@@ -642,9 +1021,9 @@ async function testOpenAIExplanation() {
     testResults.database_storage = databaseStorage;
 
     // Step 6: Store in local storage (JSON file)
-    console.log('\n💿 Step 6: Storing results in local storage...');
+    console.log('\n💿 Step 6: Storing Gemini results in local storage...');
     const timestamp = Date.now();
-    const filename = `explanation_test_${timestamp}.json`;
+    const filename = `gemini_Response_test_${timestamp}.json`;
     const filepath = path.join(__dirname, '../../test_output', filename);
 
     testResults.local_storage = {
@@ -663,24 +1042,283 @@ async function testOpenAIExplanation() {
     console.log(`✅ Test results saved to: ${filename}`);
 
     // Summary
-    console.log('\n📊 ========== TEST SUMMARY ==========');
+    console.log('\n📊 ========== GEMINI TEST SUMMARY ==========');
     console.log(`🎯 Category: ${category.CategoryName} (ID: ${HARDCODED_CATEGORY_ID})`);
     console.log(`🤖 Model: ${category.ModelName}`);
     console.log(`📄 Pages processed: ${pages.length}`);
     console.log(`🔍 OCR successful: ${successfulOCR}/${pages.length}`);
-    console.log(`🤖 AI API: ${testResults.ai_responses.primary?.success ? '✅ Success' : '❌ Failed'}`);
+    console.log(`🤖 Gemini API: ${testResults.ai_responses.primary?.success ? '✅ Success' : '❌ Failed'}`);
     console.log(`💾 Database storage: ${databaseStorage.filter(d => d.success).length}/${pages.length} successful`);
     console.log(`💿 Local storage: ✅ Saved to ${filename}`);
 
     return testResults;
 
   } catch (error) {
-    console.error('❌ Explanation generation test failed:', error);
+    console.error('❌ Gemini Response test failed:', error);
     testResults.errors.push(error.message);
     
     // Still save results even if test failed
     const timestamp = Date.now();
-    const filename = `explanation_test_failed_${timestamp}.json`;
+    const filename = `gemini_Response_test_failed_${timestamp}.json`;
+    const filepath = path.join(__dirname, '../../test_output', filename);
+    
+    const testOutputDir = path.join(__dirname, '../../test_output');
+    if (!fs.existsSync(testOutputDir)) {
+      fs.mkdirSync(testOutputDir, { recursive: true });
+    }
+    
+    fs.writeFileSync(filepath, JSON.stringify(testResults, null, 2));
+    console.log(`💿 Failed test results saved to: ${filename}`);
+    
+    throw error;
+  }
+}
+
+// Test DeepSeek Response generation
+async function testDeepSeekExplanation() {
+  console.log('\n🧪 ========== DEEPSEEK EXPLANATION TEST ==========');
+  
+  const testResults = {
+    timestamp: new Date().toISOString(),
+    test_type: 'deepseek_Response_generation',
+    model: 'DeepSeek',
+    api_key_status: DEEPSEEK_API_KEY ? 'Available' : 'Missing',
+    hardcoded_values: {},
+    category_info: {},
+    pages_processed: [],
+    ocr_results: [],
+    ai_responses: {},
+    database_storage: [],
+    local_storage: {},
+    errors: []
+  };
+
+  try {
+    if (!DEEPSEEK_API_KEY) {
+      throw new Error('DEEPSEEK_API_KEY is not configured');
+    }
+
+    // Hardcoded test values for DeepSeek
+    const HARDCODED_CATEGORY_ID = 3; // Change this to a category with DeepSeek model
+    const HARDCODED_PAGE_IDS = [1, 2, 3]; // Change these to existing page IDs
+    
+    testResults.hardcoded_values = {
+      categoryId: HARDCODED_CATEGORY_ID,
+      pageIds: HARDCODED_PAGE_IDS
+    };
+
+    console.log(`📋 Using hardcoded Category ID: ${HARDCODED_CATEGORY_ID}`);
+    console.log(`📄 Using hardcoded Page IDs: [${HARDCODED_PAGE_IDS.join(', ')}]`);
+
+    // Step 1: Fetch category information with DeepSeek model and prompt
+    console.log('\n🔍 Step 1: Fetching DeepSeek category information...');
+    const categoryInfo = await sql`
+      SELECT 
+        c."CategoryId",
+        c."Name" as "CategoryName",
+        c."Description" as "CategoryDescription",
+        m."ModelName" as "ModelName",
+        p."Prompt"
+      FROM "Category" c
+      JOIN "Model" m ON c."ModelId" = m."ModelId"
+      JOIN "Prompting" p ON c."PromptId" = p."PromptId"
+      WHERE c."CategoryId" = ${HARDCODED_CATEGORY_ID}
+        AND LOWER(m."ModelName") LIKE '%deepseek%'
+    `;
+
+    if (categoryInfo.length === 0) {
+      throw new Error(`DeepSeek category with ID ${HARDCODED_CATEGORY_ID} not found. Make sure the category uses a DeepSeek model.`);
+    }
+
+    const category = categoryInfo[0];
+    testResults.category_info = category;
+    
+    console.log(`✅ DeepSeek Category found: ${category.CategoryName}`);
+    console.log(`🤖 Model: ${category.ModelName}`);
+    console.log(`💭 Prompt: "${category.Prompt.substring(0, 100)}..."`);
+
+    // Step 2: Fetch pages by IDs
+    console.log('\n📚 Step 2: Fetching pages by IDs...');
+    const pages = await sql`
+      SELECT p."PageId", p."pageURL", p."pageNumber", b."Name" as book_title, b."BookId"
+      FROM "Pages" p
+      JOIN "Books" b ON p."BookId" = b."BookId"
+      WHERE p."PageId" = ANY(${HARDCODED_PAGE_IDS})
+      ORDER BY b."BookId", p."pageNumber"
+    `;
+
+    if (pages.length === 0) {
+      throw new Error(`No pages found with IDs: [${HARDCODED_PAGE_IDS.join(', ')}]`);
+    }
+
+    testResults.pages_processed = pages.map(p => ({
+      pageId: p.PageId,
+      pageNumber: p.pageNumber,
+      bookTitle: p.book_title,
+      pageURL: p.pageURL
+    }));
+
+    console.log(`✅ Found ${pages.length} pages`);
+    pages.forEach(page => {
+      console.log(`   📖 Page ${page.pageNumber} from "${page.book_title}" (ID: ${page.PageId})`);
+    });
+
+    // Step 3: Process OCR for all pages
+    console.log('\n🔍 Step 3: Processing OCR for all pages...');
+    const ocrResults = [];
+    let combinedContext = '';
+
+    for (const page of pages) {
+      try {
+        console.log(`📄 Processing OCR for Page ${page.pageNumber}...`);
+        const ocrText = await processOCR(page.pageURL);
+        
+        const ocrResult = {
+          pageId: page.PageId,
+          pageNumber: page.pageNumber,
+          success: true,
+          text: ocrText,
+          textLength: ocrText.length
+        };
+        
+        ocrResults.push(ocrResult);
+        combinedContext += `\n--- Page ${page.pageNumber} ---\n${ocrText}\n`;
+        
+        console.log(`✅ OCR completed for Page ${page.pageNumber}: ${ocrText.length} characters`);
+      } catch (error) {
+        console.error(`❌ OCR failed for Page ${page.pageNumber}:`, error.message);
+        ocrResults.push({
+          pageId: page.PageId,
+          pageNumber: page.pageNumber,
+          success: false,
+          error: error.message,
+          text: '',
+          textLength: 0
+        });
+      }
+    }
+
+    testResults.ocr_results = ocrResults;
+    const successfulOCR = ocrResults.filter(r => r.success).length;
+    
+    console.log(`📊 OCR Summary: ${successfulOCR}/${pages.length} pages processed successfully`);
+    console.log(`📝 Total context length: ${combinedContext.length} characters`);
+
+    // Step 4: Test DeepSeek API with context + prompt
+    console.log('\n🤖 Step 4: Testing DeepSeek API with context + prompt...');
+    const aiResponses = {};
+
+    console.log(`🎯 Using DeepSeek API for model: ${category.ModelName}`);
+
+    // Test DeepSeek API specifically
+    try {
+      console.log(`🚀 Testing DeepSeek API...`);
+      const response = await callDeepSeek(combinedContext, category.Prompt);
+      aiResponses.deepseek = { success: true, response, length: response.length };
+      console.log(`✅ DeepSeek API successful: ${response.length} characters`);
+
+      testResults.ai_responses.primary = {
+        api: 'deepseek',
+        success: true,
+        response: response,
+        length: response.length
+      };
+
+    } catch (error) {
+      console.error(`❌ DeepSeek API failed:`, error.message);
+      testResults.ai_responses.primary = {
+        api: 'deepseek',
+        success: false,
+        error: error.message
+      };
+      throw error; // Re-throw since this is specifically a DeepSeek test
+    }
+
+    // Step 5: Store responses in database (Explanation table)
+    console.log('\n💾 Step 5: Storing Responses in database...');
+    const databaseStorage = [];
+    
+    const finalResponse = testResults.ai_responses.primary?.response || 
+                         'AI processing failed - no response generated';
+
+    for (const page of pages) {
+      try {
+        const Response = await sql`
+          INSERT INTO "Explanation" (
+            "PageId",
+            "CategoryId", 
+            "Response"
+          )
+          VALUES (
+            ${page.PageId},
+            ${HARDCODED_CATEGORY_ID},
+            ${finalResponse}
+          )
+          RETURNING "ExplanationId", "PageId", "CategoryId", "created_at"
+        `;
+
+        databaseStorage.push({
+          ResponseId: Response[0].ExplanationId,
+          pageId: page.PageId,
+          categoryId: HARDCODED_CATEGORY_ID,
+          success: true,
+          created_at: Response[0].created_at
+        });
+
+        console.log(`✅ Stored Response for Page ${page.PageId}: ExplanationId ${Response[0].ExplanationId}`);
+      } catch (error) {
+        console.error(`❌ Failed to store Response for Page ${page.PageId}:`, error.message);
+        databaseStorage.push({
+          pageId: page.PageId,
+          categoryId: HARDCODED_CATEGORY_ID,
+          success: false,
+          error: error.message
+        });
+      }
+    }
+
+    testResults.database_storage = databaseStorage;
+
+    // Step 6: Store in local storage (JSON file)
+    console.log('\n💿 Step 6: Storing DeepSeek results in local storage...');
+    const timestamp = Date.now();
+    const filename = `deepseek_Response_test_${timestamp}.json`;
+    const filepath = path.join(__dirname, '../../test_output', filename);
+
+    testResults.local_storage = {
+      filename,
+      filepath,
+      timestamp
+    };
+
+    // Ensure test_output directory exists
+    const testOutputDir = path.join(__dirname, '../../test_output');
+    if (!fs.existsSync(testOutputDir)) {
+      fs.mkdirSync(testOutputDir, { recursive: true });
+    }
+
+    fs.writeFileSync(filepath, JSON.stringify(testResults, null, 2));
+    console.log(`✅ Test results saved to: ${filename}`);
+
+    // Summary
+    console.log('\n📊 ========== DEEPSEEK TEST SUMMARY ==========');
+    console.log(`🎯 Category: ${category.CategoryName} (ID: ${HARDCODED_CATEGORY_ID})`);
+    console.log(`🤖 Model: ${category.ModelName}`);
+    console.log(`📄 Pages processed: ${pages.length}`);
+    console.log(`🔍 OCR successful: ${successfulOCR}/${pages.length}`);
+    console.log(`🤖 DeepSeek API: ${testResults.ai_responses.primary?.success ? '✅ Success' : '❌ Failed'}`);
+    console.log(`💾 Database storage: ${databaseStorage.filter(d => d.success).length}/${pages.length} successful`);
+    console.log(`💿 Local storage: ✅ Saved to ${filename}`);
+
+    return testResults;
+
+  } catch (error) {
+    console.error('❌ DeepSeek Response test failed:', error);
+    testResults.errors.push(error.message);
+    
+    // Still save results even if test failed
+    const timestamp = Date.now();
+    const filename = `deepseek_Response_test_failed_${timestamp}.json`;
     const filepath = path.join(__dirname, '../../test_output', filename);
     
     const testOutputDir = path.join(__dirname, '../../test_output');
@@ -703,12 +1341,18 @@ module.exports = {
   callGemini,
   callDeepSeek,
   runComprehensiveTest,
-  testExplanationGeneration
+  testOpenAIExplanation,
+  testGeminiExplanation,
+  testDeepSeekExplanation
 };
 
 // Run comprehensive test if this file is executed directly
 if (require.main === module) {
   // You can choose which test to run:
   // runComprehensiveTest().catch(console.error);
-  testExplanationGeneration().catch(console.error);
+  
+  // Test individual AI models:
+  testOpenAIExplanation().catch(console.error);
+  // testGeminiExplanation().catch(console.error);
+  // testDeepSeekExplanation().catch(console.error);
 }
