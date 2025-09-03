@@ -25,6 +25,8 @@ const sql = postgres(DATABASE_URL, {
 // Import routes
 const userRoutes = require("./routes/users.js");
 const bookRoutes = require("./routes/books.js");
+const bookDetailsRoutes = require("./routes/bookDetails.js");
+const modelRoutes = require("./routes/models.js");
 
 // Swagger documentation
 app.use(
@@ -39,6 +41,8 @@ app.use(
 // API routes
 app.use("/api/users", userRoutes);
 app.use("/api/books", bookRoutes);
+app.use("/api/books", bookDetailsRoutes);
+app.use("/api/models", modelRoutes);
 
 // Database connection function
 async function connectToDatabase() {

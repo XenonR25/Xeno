@@ -8,6 +8,20 @@ const { authenticateToken } = require("../utils/auth.js");
 const {
   processPdfAndExtractInfo,
   processPdfAndUploadPages,
+  extractTextFromImageUrl,
+  extractBookInfo,
+  generateGenericBookInfo,
+  testFirstPageOCR,
+  testOCRFromImageUrl,
+  testOCROnLocalImage,
+  processTextFileAndCreateBook,
+  testCloudinaryPageUpload,
+  runAllTests,
+  downloadFile,
+  buildPageImageUrl,
+  tryGeminiModels,
+  uploadPageToCloudinary,
+  generatePageId,
 } = require("../utils/pdfProcessor.js");
 
 const router = express.Router();
@@ -144,9 +158,9 @@ router.post(
         processingResult.pages.map(
           (page) =>
             sql`
-            INSERT INTO "Pages" ("pageNumber", "pageURL", "uniquePageId", "cloudinaryId", "publicId", "BookId")
-            VALUES (${page.pageNumber}, ${page.pageURL}, ${page.pageId}, ${page.cloudinaryId}, ${page.publicId}, ${bookId})
-            RETURNING "PageId", "pageNumber", "pageURL", "uniquePageId", "cloudinaryId", "publicId"
+            INSERT INTO "Pages" ("pageNumber", "pageURL", "PageId", "cloudinaryId", "BookId")
+            VALUES (${page.pageNumber}, ${page.pageURL}, ${page.uniquePageId}, ${page.cloudinaryId}, ${bookId})
+            RETURNING "PageId", "pageNumber", "pageURL", "PageId", "cloudinaryId"
           `
         )
       );
@@ -273,78 +287,7 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/books/{bookId}:
- *   get:
- *     summary: Get book details with all pages
- *     tags: [Books]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: bookId
- *         required: true
- *         schema:
- *           type: integer
- *         description: Book ID
- *     responses:
- *       200:
- *         description: Book details retrieved successfully
- *       404:
- *         description: Book not found
- */
-router.get("/:bookId", authenticateToken, async (req, res) => {
-  try {
-    const userId = req.user.userId;
-    const { bookId } = req.params;
-
-    // Get book details
-    const book = await sql`
-      SELECT "BookId", "Name", "author", "created_at", "uploaded_at", "lastopened_at"
-      FROM "Books" 
-      WHERE "BookId" = ${parseInt(bookId)} AND "UserId" = ${userId}
-    `;
-
-    if (book.length === 0) {
-      return res.status(404).json({
-        status: "error",
-        message: "Book not found",
-      });
-    }
-
-    // Get all pages for the book
-    const pages = await sql`
-      SELECT "PageId", "pageNumber", "pageURL", "uniquePageId", "cloudinaryId", "publicId"
-      FROM "Pages" 
-      WHERE "BookId" = ${parseInt(bookId)}
-      ORDER BY "pageNumber"
-    `;
-
-    // Update last opened time
-    await sql`
-      UPDATE "Books" 
-      SET "lastopened_at" = NOW() 
-      WHERE "BookId" = ${parseInt(bookId)}
-    `;
-
-    return res.json({
-      status: "success",
-      data: {
-        book: book[0],
-        pages,
-        totalPages: pages.length,
-      },
-    });
-  } catch (error) {
-    console.error("Get book error:", error);
-    return res.status(500).json({
-      status: "error",
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-});
+// Book details endpoint moved to bookDetails.js
 
 /**
  * @swagger
@@ -448,7 +391,7 @@ router.get("/:bookId/pages", authenticateToken, async (req, res) => {
 
     // Get all pages
     const pages = await sql`
-      SELECT "PageId", "pageNumber", "pageURL", "uniquePageId", "cloudinaryId", "publicId"
+      SELECT "PageId", "pageNumber", "pageURL", "cloudinaryId"
       FROM "Pages" 
       WHERE "BookId" = ${parseInt(bookId)}
       ORDER BY "pageNumber"
@@ -474,37 +417,37 @@ router.get("/:bookId/pages", authenticateToken, async (req, res) => {
 
 /**
  * @swagger
- * /api/books/pages/{uniquePageId}:
+ * /api/books/pages/{PageId}:
  *   get:
- *     summary: Get a specific page by its unique page ID
+ *     summary: Get a specific page by its  page ID
  *     tags: [Books]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: uniquePageId
+ *         name: PageId
  *         required: true
  *         schema:
  *           type: string
- *         description: Unique page ID
+ *         description: page ID
  *     responses:
  *       200:
  *         description: Page retrieved successfully
  *       404:
  *         description: Page not found
  */
-router.get("/pages/:uniquePageId", authenticateToken, async (req, res) => {
+router.get("/pages/:PageId", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { uniquePageId } = req.params;
+    const { PageId } = req.params;
 
     // Get page with book information
     const page = await sql`
-      SELECT p."PageId", p."pageNumber", p."pageURL", p."uniquePageId", p."cloudinaryId", p."publicId",
+      SELECT p."PageId", p."pageNumber", p."pageURL", p."cloudinaryId",
              b."BookId", b."Name" as bookName, b."author"
       FROM "Pages" p
       JOIN "Books" b ON p."BookId" = b."BookId"
-      WHERE p."uniquePageId" = ${uniquePageId} AND b."UserId" = ${userId}
+      WHERE p."PageId" = ${PageId} AND b."UserId" = ${userId}
     `;
 
     if (page.length === 0) {
@@ -527,6 +470,399 @@ router.get("/pages/:uniquePageId", authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error("Get page by unique ID error:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/books/test/ocr:
+ *   post:
+ *     summary: Test OCR functionality on a PDF file
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - pdfFile
+ *             properties:
+ *               pdfFile:
+ *                 type: string
+ *                 format: binary
+ *                 description: PDF file to test OCR on
+ *     responses:
+ *       200:
+ *         description: OCR test completed successfully
+ *       400:
+ *         description: Invalid file or processing error
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.post(
+  "/test/ocr",
+  authenticateToken,
+  upload.single("pdfFile"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          status: "error",
+          message: "PDF file is required",
+        });
+      }
+
+      const pdfPath = req.file.path;
+      console.log(`🧪 Testing OCR on PDF: ${req.file.originalname}`);
+
+      // Test OCR on first page
+      const ocrResult = await testFirstPageOCR(pdfPath);
+
+      // Clean up uploaded PDF file
+      try {
+        fs.unlinkSync(pdfPath);
+      } catch (_) {}
+
+      if (ocrResult.success) {
+        return res.json({
+          status: "success",
+          message: "OCR test completed successfully",
+          data: {
+            extractedText: ocrResult.extractedText,
+            totalPages: ocrResult.totalPages,
+            imageUrl: ocrResult.imageUrl,
+            cloudinaryInfo: ocrResult.cloudinaryInfo,
+          },
+        });
+      } else {
+        return res.status(400).json({
+          status: "error",
+          message: "OCR test failed",
+          error: ocrResult.error,
+        });
+      }
+    } catch (error) {
+      console.error("OCR test error:", error);
+
+      // Clean up uploaded file if it exists
+      if (req.file && fs.existsSync(req.file.path)) {
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (_) {}
+      }
+
+      return res.status(500).json({
+        status: "error",
+        message: "Failed to complete OCR test",
+        error: error.message,
+      });
+    }
+  }
+);
+
+/**
+ * @swagger
+ * /api/books/test/cloudinary-upload:
+ *   post:
+ *     summary: Test Cloudinary page upload functionality
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - pdfFile
+ *             properties:
+ *               pdfFile:
+ *                 type: string
+ *                 format: binary
+ *                 description: PDF file to test page upload on
+ *     responses:
+ *       200:
+ *         description: Cloudinary upload test completed successfully
+ *       400:
+ *         description: Invalid file or processing error
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.post(
+  "/test/cloudinary-upload",
+  authenticateToken,
+  upload.single("pdfFile"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          status: "error",
+          message: "PDF file is required",
+        });
+      }
+
+      const pdfPath = req.file.path;
+      const tempBookId = Math.floor(Math.random() * 10000) + 1000;
+
+      console.log(
+        `🧪 Testing Cloudinary page upload on PDF: ${req.file.originalname}`
+      );
+      console.log(`📚 Using temporary book ID: ${tempBookId}`);
+
+      // Test Cloudinary page upload
+      const uploadResult = await testCloudinaryPageUpload(pdfPath, tempBookId);
+
+      // Clean up uploaded PDF file
+      try {
+        fs.unlinkSync(pdfPath);
+      } catch (_) {}
+
+      if (uploadResult.success) {
+        return res.json({
+          status: "success",
+          message: "Cloudinary upload test completed successfully",
+          data: {
+            bookInfo: uploadResult.result.bookInfo,
+            totalPages: uploadResult.result.pages.length,
+            localImagesPath: uploadResult.result.localImagesPath,
+            originalPdfPublicId: uploadResult.result.originalPdfPublicId,
+            originalPdfVersion: uploadResult.result.originalPdfVersion,
+            pages: uploadResult.result.pages.map((page) => ({
+              pageNumber: page.pageNumber,
+              pageId: page.pageId,
+              pageURL: page.pageURL,
+              cloudinaryId: page.cloudinaryId,
+            })),
+          },
+        });
+      } else {
+        return res.status(400).json({
+          status: "error",
+          message: "Cloudinary upload test failed",
+          error: uploadResult.error,
+        });
+      }
+    } catch (error) {
+      console.error("Cloudinary upload test error:", error);
+
+      // Clean up uploaded file if it exists
+      if (req.file && fs.existsSync(req.file.path)) {
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (_) {}
+      }
+
+      return res.status(500).json({
+        status: "error",
+        message: "Failed to complete Cloudinary upload test",
+        error: error.message,
+      });
+    }
+  }
+);
+
+/**
+ * @swagger
+ * /api/books/{bookId}/page-ids:
+ *   get:
+ *     summary: Get all page IDs for a specific book
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bookId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Book ID
+ *     responses:
+ *       200:
+ *         description: Page IDs retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     bookId:
+ *                       type: integer
+ *                       description: The book ID
+ *                     pageIds:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           pageId:
+ *                             type: integer
+ *                             description: Database page ID
+ *                           uniquePageId:
+ *                             type: string
+ *                             description: Unique page identifier
+ *                           pageNumber:
+ *                             type: integer
+ *                             description: Page number in the book
+ *                           cloudinaryId:
+ *                             type: string
+ *                             description: Cloudinary asset ID
+ *                     totalPages:
+ *                       type: integer
+ *                       description: Total number of pages
+ *       404:
+ *         description: Book not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/:bookId/page-ids", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { bookId } = req.params;
+
+    // Check if book exists and belongs to user
+    const book = await sql`
+      SELECT "BookId", "Name", "author" FROM "Books" 
+      WHERE "BookId" = ${parseInt(bookId)} AND "UserId" = ${userId}
+    `;
+
+    if (book.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Book not found",
+      });
+    }
+
+    // Get all page IDs and essential info
+    const pageIds = await sql`
+      SELECT 
+        "PageId",
+        "uniquePageId", 
+        "pageNumber",
+        "cloudinaryId"
+      FROM "Pages" 
+      WHERE "BookId" = ${parseInt(bookId)}
+      ORDER BY "pageNumber"
+    `;
+
+    return res.json({
+      status: "success",
+      data: {
+        bookId: parseInt(bookId),
+        bookName: book[0].Name,
+        author: book[0].author,
+        pageIds: pageIds.map((page) => ({
+          pageId: page.PageId,
+          uniquePageId: page.uniquePageId,
+          pageNumber: page.pageNumber,
+          cloudinaryId: page.cloudinaryId,
+        })),
+        totalPages: pageIds.length,
+      },
+    });
+  } catch (error) {
+    console.error("Get page IDs error:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/books/{bookId}/page-ids/simple:
+ *   get:
+ *     summary: Get just the page IDs as a simple array
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bookId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Book ID
+ *     responses:
+ *       200:
+ *         description: Page IDs retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     pageIds:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       description: Array of unique page IDs
+ *                     totalPages:
+ *                       type: integer
+ *                       description: Total number of pages
+ *       404:
+ *         description: Book not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/:bookId/page-ids/simple", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { bookId } = req.params;
+
+    // Check if book exists and belongs to user
+    const book = await sql`
+      SELECT "BookId" FROM "Books" 
+      WHERE "BookId" = ${parseInt(bookId)} AND "UserId" = ${userId}
+    `;
+
+    if (book.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Book not found",
+      });
+    }
+
+    // Get just the unique page IDs
+    const pageIds = await sql`
+      SELECT "uniquePageId"
+      FROM "Pages" 
+      WHERE "BookId" = ${parseInt(bookId)}
+      ORDER BY "pageNumber"
+    `;
+
+    return res.json({
+      status: "success",
+      data: {
+        pageIds: pageIds.map((page) => page.uniquePageId),
+        totalPages: pageIds.length,
+      },
+    });
+  } catch (error) {
+    console.error("Get simple page IDs error:", error);
     return res.status(500).json({
       status: "error",
       message: "Internal server error",

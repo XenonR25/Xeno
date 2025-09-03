@@ -15,16 +15,12 @@ async function migratePagesTable() {
     const migrations = [
       {
         name: "Add uniquePageId column",
-        query: `ALTER TABLE "Pages" ADD COLUMN IF NOT EXISTS "uniquePageId" VARCHAR(255) UNIQUE;`
+        query: `ALTER TABLE "Pages" ADD COLUMN IF NOT EXISTS "uniquePageId" VARCHAR(255) UNIQUE;`,
       },
       {
-        name: "Add cloudinaryId column", 
-        query: `ALTER TABLE "Pages" ADD COLUMN IF NOT EXISTS "cloudinaryId" VARCHAR(255);`
+        name: "Add cloudinaryId column",
+        query: `ALTER TABLE "Pages" ADD COLUMN IF NOT EXISTS "cloudinaryId" VARCHAR(255);`,
       },
-      {
-        name: "Add publicId column",
-        query: `ALTER TABLE "Pages" ADD COLUMN IF NOT EXISTS "publicId" VARCHAR(255);`
-      }
     ];
 
     for (const migration of migrations) {
@@ -37,7 +33,10 @@ async function migratePagesTable() {
           // Column already exists
           console.log(`ℹ️ Column already exists for: ${migration.name}`);
         } else {
-          console.error(`❌ Migration failed for ${migration.name}:`, error.message);
+          console.error(
+            `❌ Migration failed for ${migration.name}:`,
+            error.message
+          );
           throw error;
         }
       }

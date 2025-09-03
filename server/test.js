@@ -436,7 +436,6 @@ async function uploadPageToCloudinary(imagePath, bookId, pageNumber) {
       pageId,
       pageNumber,
       pageURL: uploadResult.secure_url,
-      publicId: uploadResult.public_id,
       cloudinaryId: uploadResult.asset_id,
     };
   } catch (error) {
@@ -494,7 +493,7 @@ async function processPdfAndUploadPages(pdfPath, bookId) {
       };
     });
 
-    // Save images locally
+    // Save images locally - KEEP THEM in local_books folder
     const localRoot = path.join(__dirname, "../local_books", `${timestamp}`);
     fs.mkdirSync(localRoot, { recursive: true });
 
@@ -509,6 +508,7 @@ async function processPdfAndUploadPages(pdfPath, bookId) {
 
     await Promise.all(downloadTasks);
     console.log(`✅ All ${pageUrls.length} pages downloaded to: ${localRoot}`);
+    console.log(`📁 Local images saved in: ${localRoot}`);
 
     // STEP 3: Upload each page individually to Cloudinary with unique IDs
     console.log("☁️ Step 3: Uploading individual pages to Cloudinary...");
@@ -521,36 +521,15 @@ async function processPdfAndUploadPages(pdfPath, bookId) {
       `✅ All ${uploadedPages.length} pages uploaded to Cloudinary with unique IDs`
     );
 
-    // Clean up local files
-    console.log("🧹 Cleaning up local files...");
-    pageUrls.forEach((page) => {
-      if (page.localPath && fs.existsSync(page.localPath)) {
-        try {
-          fs.unlinkSync(page.localPath);
-        } catch (error) {
-          console.warn(
-            `Failed to delete local file ${page.localPath}:`,
-            error.message
-          );
-        }
-      }
-    });
-
-    // Try to remove the local directory if empty
-    try {
-      if (fs.existsSync(localRoot) && fs.readdirSync(localRoot).length === 0) {
-        fs.rmdirSync(localRoot);
-      }
-    } catch (error) {
-      console.warn(
-        `Failed to remove local directory ${localRoot}:`,
-        error.message
-      );
-    }
+    // DON'T clean up local files - keep them for user access
+    console.log(
+      "💾 Keeping local images in local_books folder for user access"
+    );
 
     return {
       bookInfo,
       pages: uploadedPages,
+      localImagesPath: localRoot,
       originalPdfPublicId: publicId,
       originalPdfVersion: version,
     };
@@ -560,7 +539,7 @@ async function processPdfAndUploadPages(pdfPath, bookId) {
 }
 
 // Test function for Cloudinary page upload functionality
-async function testCloudinaryPageUpload(pdfPath, bookId = 999) {
+async function testCloudinaryPageUpload(pdfPath, bookId = null) {
   try {
     console.log("🧪 Testing Cloudinary page upload functionality...");
     console.log("=".repeat(60));
@@ -570,14 +549,17 @@ async function testCloudinaryPageUpload(pdfPath, bookId = 999) {
     }
 
     console.log(`📁 Processing PDF: ${pdfPath}`);
-    console.log(`📚 Book ID for testing: ${bookId}`);
+
+    // Generate a temporary book ID for testing if none provided
+    const tempBookId = bookId || Math.floor(Math.random() * 10000) + 1000;
+    console.log(`📚 Book ID for testing: ${tempBookId}`);
 
     // Test the generatePageId function first
-    const testPageId = generatePageId(bookId, 1);
+    const testPageId = generatePageId(tempBookId, 1);
     console.log(`✅ Generated test page ID: ${testPageId}`);
 
     // Process PDF and upload all pages individually
-    const result = await processPdfAndUploadPages(pdfPath, bookId);
+    const result = await processPdfAndUploadPages(pdfPath, tempBookId);
 
     console.log("\n" + "=".repeat(60));
     console.log("📖 CLOUDINARY PAGE UPLOAD RESULTS:");
@@ -588,6 +570,7 @@ async function testCloudinaryPageUpload(pdfPath, bookId = 999) {
     console.log(`📄 Total pages processed: ${result.pages.length}`);
     console.log(`☁️ Original PDF Public ID: ${result.originalPdfPublicId}`);
     console.log(`🔢 Original PDF Version: ${result.originalPdfVersion}`);
+    console.log(`📁 Local images saved in: ${result.localImagesPath}`);
 
     console.log("\n📋 Individual Page Details:");
     console.log("-".repeat(40));
@@ -596,9 +579,68 @@ async function testCloudinaryPageUpload(pdfPath, bookId = 999) {
       console.log(`  📄 Unique ID: ${page.pageId}`);
       console.log(`  🔗 URL: ${page.pageURL}`);
       console.log(`  ☁️ Cloudinary ID: ${page.cloudinaryId}`);
-      console.log(`  🆔 Public ID: ${page.publicId}`);
       console.log("");
     });
+
+    // STEP 4: Store book and pages in Supabase database
+    console.log("\n💾 STEP 4: Storing data in Supabase database...");
+    const postgres = require("postgres");
+    const { DATABASE_URL } = require("./db.js");
+
+    const sql = postgres(DATABASE_URL, {
+      max: 10,
+      idle_timeout: 20,
+      connect_timeout: 10,
+    });
+
+    try {
+      // Create book record in database
+      console.log("📝 Creating book record in database...");
+      const newBook = await sql`
+        INSERT INTO "Books" ("Name", "author", "UserId")
+        VALUES (${result.bookInfo.bookName}, ${result.bookInfo.authorName}, 1)
+        RETURNING "BookId", "Name", "author", "created_at", "uploaded_at"
+      `;
+
+      if (newBook.length === 0) {
+        throw new Error("Failed to create book record in database");
+      }
+
+      const actualBookId = newBook[0].BookId;
+      console.log(`✅ Book created in database with ID: ${actualBookId}`);
+
+      // Create page records for all uploaded pages
+      console.log("📄 Creating page records in database...");
+      const pageResults = await Promise.all(
+        result.pages.map(
+          (page) =>
+            sql`
+          INSERT INTO "Pages" ("pageNumber", "pageURL", "PageId", "cloudinaryId", "BookId")
+          VALUES (${page.pageNumber}, ${page.pageURL}, ${page.pageId}, ${page.cloudinaryId}, ${actualBookId})
+          RETURNING "PageId", "pageNumber", "pageURL", "PageId", "cloudinaryId"
+        `
+        )
+      );
+
+      console.log(`✅ Created ${pageResults.length} page records in database`);
+      console.log("🎉 All data successfully stored in Supabase!");
+
+      // Update result with database info
+      result.databaseInfo = {
+        bookId: actualBookId,
+        pagesCreated: pageResults.length,
+        bookRecord: newBook[0],
+        pageRecords: pageResults.map((r) => r[0]),
+      };
+    } catch (dbError) {
+      console.error("❌ Database operation failed:", dbError.message);
+      console.log(
+        "⚠️ Cloudinary upload successful, but database storage failed"
+      );
+      result.databaseError = dbError.message;
+    } finally {
+      await sql.end();
+    }
 
     // Save results to file
     const outputDir = path.join(__dirname, "../test_output");
@@ -675,7 +717,7 @@ async function runAllTests() {
   // Test 5: Cloudinary page upload functionality
   console.log("\n📋 TEST 5: Cloudinary page upload functionality");
   console.log("-".repeat(40));
-  const cloudinaryResult = await testCloudinaryPageUpload(pdfPath, 999);
+  const cloudinaryResult = await testCloudinaryPageUpload(pdfPath);
 
   if (cloudinaryResult.success) {
     console.log("✅ Cloudinary page upload test completed successfully!");
@@ -701,9 +743,70 @@ module.exports = {
   processPdfAndUploadPages,
   testCloudinaryPageUpload,
   runAllTests,
+  testGeminiAPIKey,
 };
+
+// Test Gemini API key functionality
+async function testGeminiAPIKey() {
+  console.log("🧪 Testing Gemini API Key Functionality...");
+  console.log("=".repeat(50));
+  
+  try {
+    // Check if API key is configured
+    console.log(`🔑 API Key Status: ${GEMINI_API_KEY ? '✅ Configured' : '❌ Missing'}`);
+    
+    if (!GEMINI_API_KEY) {
+      throw new Error("Gemini API key not found in environment variables");
+    }
+    
+    // Test with a simple prompt
+    const testPrompt = "Hello! Please respond with 'Gemini API is working correctly' to confirm the connection.";
+    
+    console.log("🤖 Testing Gemini API with simple prompt...");
+    console.log(`📝 Test prompt: "${testPrompt}"`);
+    
+    const response = await tryGeminiModels(testPrompt);
+    
+    console.log("✅ Gemini API test successful!");
+    console.log(`📄 Response length: ${response.length} characters`);
+    console.log(`💬 Response: "${response}"`);
+    
+    return {
+      success: true,
+      response,
+      apiKeyConfigured: true
+    };
+    
+  } catch (error) {
+    console.error("❌ Gemini API test failed:", error.message);
+    
+    // Additional debugging info
+    if (error.message.includes('API_KEY_INVALID')) {
+      console.log("🔍 Diagnosis: API key appears to be invalid");
+    } else if (error.message.includes('quota')) {
+      console.log("🔍 Diagnosis: API quota may be exceeded");
+    } else if (error.message.includes('network')) {
+      console.log("🔍 Diagnosis: Network connectivity issue");
+    }
+    
+    return {
+      success: false,
+      error: error.message,
+      apiKeyConfigured: !!GEMINI_API_KEY
+    };
+  }
+}
 
 // Run tests if this file is executed directly
 if (require.main === module) {
-  runAllTests().catch(console.error);
+  // Test Gemini API key first
+  testGeminiAPIKey().then(result => {
+    if (result.success) {
+      console.log("\n🎉 Gemini API key test passed! Running full test suite...\n");
+      return runAllTests();
+    } else {
+      console.log("\n⚠️ Gemini API key test failed. Skipping full test suite.");
+      console.log("Please check your API key configuration before running full tests.");
+    }
+  }).catch(console.error);
 }

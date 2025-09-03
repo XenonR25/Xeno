@@ -7,12 +7,17 @@ async function runCloudinaryTest() {
 
     // Test with the sample PDF
     const pdfPath = "./assets/sample.pdf";
-    const testBookId = 123;
 
     console.log(`📄 Testing with PDF: ${pdfPath}`);
-    console.log(`📚 Using test book ID: ${testBookId}`);
+    console.log("This will:");
+    console.log("1. Upload PDF to Cloudinary");
+    console.log("2. Extract all pages as images");
+    console.log("3. Save images to local_books folder");
+    console.log("4. Upload individual pages to Cloudinary");
+    console.log("5. Store book and pages in Supabase database");
+    console.log("");
 
-    const result = await testCloudinaryPageUpload(pdfPath, testBookId);
+    const result = await testCloudinaryPageUpload(pdfPath);
 
     if (result.success) {
       console.log("\n🎉 Test completed successfully!");
@@ -23,14 +28,28 @@ async function runCloudinaryTest() {
         `   📚 Book: "${result.result.bookInfo.bookName}" by ${result.result.bookInfo.authorName}`
       );
       console.log(`   📄 Total pages: ${result.result.pages.length}`);
-      console.log(
-        `   ☁️ Original PDF ID: ${result.result.originalPdfPublicId}`
-      );
+      console.log(`   📁 Local images saved in: ${result.result.localImagesPath}`);
+      
+      if (result.result.databaseInfo) {
+        console.log(`   💾 Database Book ID: ${result.result.databaseInfo.bookId}`);
+        console.log(`   📊 Pages stored in database: ${result.result.databaseInfo.pagesCreated}`);
+      }
 
       console.log("\n📋 Page Details:");
       result.result.pages.forEach((page, index) => {
         console.log(`   Page ${page.pageNumber}: ${page.pageId}`);
       });
+      
+      // List the local images
+      const fs = require("fs");
+      const localPath = result.result.localImagesPath;
+      if (fs.existsSync(localPath)) {
+        const files = fs.readdirSync(localPath);
+        console.log(`\n📁 Local images in ${localPath}:`);
+        files.forEach(file => {
+          console.log(`   📄 ${file}`);
+        });
+      }
     } else {
       console.log("\n❌ Test failed!");
       console.log(`Error: ${result.error}`);
