@@ -1,0 +1,141 @@
+{
+  "quizId": "10",
+  "questions": [
+    {
+      "questionId": "72",
+      "question": "What is the painter in the scenario asked to create a picture of?",
+      "options": {
+        "A": "A landscape",
+        "B": "The species of the painter",
+        "C": "A self-portrait",
+        "D": "A cityscape"
+      },
+      "correctAnswer": "B",
+      "explanation": "The content specifies that the painter is to create a picture of the species that the painter is, meaning the painter is painting a portrait of his own species.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "73",
+      "question": "Where is the picture supposed to be relevant to?",
+      "options": {
+        "A": "The Pacific Northwest",
+        "B": "The South",
+        "C": "The Midwest",
+        "D": "The East Coast"
+      },
+      "correctAnswer": "A",
+      "explanation": "The content states that the picture should be relevant to the Pacific Northwest.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "74",
+      "question": "What is the painter drawing inspiration from?",
+      "options": {
+        "A": "The landscape",
+        "B": "Other painters",
+        "C": "The individuals of his species sitting in front of him",
+        "D": "His imagination"
+      },
+      "correctAnswer": "C",
+      "explanation": "The content mentions that the painter draws his inspiration from the individuals of his species sitting in front of him.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "75",
+      "question": "What is the objective of the Double Diamond: Phase: Define?",
+      "options": {
+        "A": "To create a design",
+        "B": "To synthesize insights into clear problem statement and user requirements",
+        "C": "To execute the design",
+        "D": "To test the design"
+      },
+      "correctAnswer": "B",
+      "explanation": "The content specifies that the objective of the Double Diamond: Phase: Define is to synthesize insights into clear problem statement and user requirements.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "76",
+      "question": "What is the method used in the Double Diamond: Phase: Define?",
+      "options": {
+        "A": "Synthesize data -> Problem statement; Persona, Journey mapping ->User requirements",
+        "B": "Brainstorming -> Idea generation",
+        "C": "Research -> Data collection",
+        "D": "Execution -> Implementation"
+      },
+      "correctAnswer": "A",
+      "explanation": "The content states that the method used in the Double Diamond: Phase: Define is 'Synthesize data -> Problem statement; Persona, Journey mapping ->User requirements.'",
+      "myAnswer": null
+    },
+    {
+      "questionId": "77",
+      "question": "What are the classes mentioned in the Double Diamond: Phase: Define?",
+      "options": {
+        "A": "Thematic Analysis, Personas, Journey maps",
+        "B": "Research, Brainstorming, Execution",
+        "C": "Data collection, Idea generation, Implementation",
+        "D": "Problem statement, User requirements, Design brief"
+      },
+      "correctAnswer": "A",
+      "explanation": "The classes mentioned in the Double Diamond: Phase: Define are Thematic Analysis, Personas, Journey maps.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "78",
+      "question": "What is the expected outcome of the Double Diamond: Phase: Define?",
+      "options": {
+        "A": "A design brief that provides a focused direction for developing solutions",
+        "B": "A fully developed design",
+        "C": "A collection of data",
+        "D": "A set of ideas for designing"
+      },
+      "correctAnswer": "A",
+      "explanation": "The content specifies that the expected outcome of the Double Diamond: Phase: Define is 'a design brief that provides a focused direction for developing solutions.'",
+      "myAnswer": null
+    },
+    {
+      "questionId": "79",
+      "question": "What elements should the painter's picture be?",
+      "options": {
+        "A": "Cute and relevant to the Pacific Northwest",
+        "B": "Gloomy and relevant to the Pacific Northwest",
+        "C": "Cute and relevant to the South",
+        "D": "Gloomy and relevant to the South"
+      },
+      "correctAnswer": "A",
+      "explanation": "The content mentions that the painter's picture should be 'cute, relevant to the Pacific Northwest.'",
+      "myAnswer": null
+    },
+    {
+      "questionId": "80",
+      "question": "What is the painter in the scenario painting?",
+      "options": {
+        "A": "A landscape",
+        "B": "A portrait",
+        "C": "A self-portrait",
+        "D": "A cityscape"
+      },
+      "correctAnswer": "B",
+      "explanation": "The content specifies that the painter is creating a portrait.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "81",
+      "question": "What is the 'Double Diamond: Phase: Define' related to?",
+      "options": {
+        "A": "Painting",
+        "B": "Design process",
+        "C": "Data collection",
+        "D": "Idea generation"
+      },
+      "correctAnswer": "B",
+      "explanation": "The content refers to the 'Double Diamond: Phase: Define' in the context of a design process.",
+      "myAnswer": null
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-09-04T11:28:31.321Z",
+    "totalQuestions": 10,
+    "difficulty": "easy",
+    "generatedBy": "AI"
+  }
+}

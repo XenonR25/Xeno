@@ -198,17 +198,23 @@ async function callDeepSeek(context, prompt) {
  */
 router.post("/generate", authenticateToken, async (req, res) => {
   try {
-    const { pageIds, categoryId } = req.body;
+    const { pageIds, categoryId, bookId, pageNumbers } = req.body;
 
     // Validate required fields
-    if (!pageIds || !Array.isArray(pageIds) || pageIds.length === 0 || !categoryId) {
+    if ((!pageIds || !Array.isArray(pageIds) || pageIds.length === 0) && 
+        (!(bookId && pageNumbers && Array.isArray(pageNumbers) && pageNumbers.length > 0)) || 
+        !categoryId) {
       return res.status(400).json({
         status: "error",
-        message: "pageIds (array) and categoryId are required",
+        message: "Provide either pageIds (array) or (bookId and pageNumbers array), and a valid categoryId",
       });
     }
 
-    console.log(`🔧 Generating explanation for ${pageIds.length} pages with categoryId: ${categoryId}`);
+    console.log(`🔧 Generating explanation - incoming payload:`);
+    console.log(`   • pageIds: ${Array.isArray(pageIds) ? pageIds.join(',') : 'N/A'}`);
+    console.log(`   • bookId: ${bookId ?? 'N/A'}`);
+    console.log(`   • pageNumbers: ${Array.isArray(pageNumbers) ? pageNumbers.join(',') : 'N/A'}`);
+    console.log(`   • categoryId: ${categoryId}`);
 
     // Get category with model and prompt info
     const category = await sql`
@@ -230,13 +236,25 @@ router.post("/generate", authenticateToken, async (req, res) => {
 
     const categoryInfo = category[0];
 
-    // Get pages information
-    const pages = await sql`
-      SELECT "PageId", "pageNumber", "pageURL", "BookId"
-      FROM "Pages"
-      WHERE "PageId" = ANY(${pageIds.map(id => parseInt(id))})
-      ORDER BY "pageNumber"
-    `;
+    // Resolve pages to process
+    let pages = [];
+    if (pageIds && Array.isArray(pageIds) && pageIds.length > 0) {
+      // Get pages by PageId list
+      pages = await sql`
+        SELECT "PageId", "pageNumber", "pageURL", "BookId"
+        FROM "Pages"
+        WHERE "PageId" = ANY(${pageIds.map(id => parseInt(id))})
+        ORDER BY "pageNumber"
+      `;
+    } else if (bookId && pageNumbers && Array.isArray(pageNumbers) && pageNumbers.length > 0) {
+      // Get pages by bookId and pageNumbers
+      pages = await sql`
+        SELECT "PageId", "pageNumber", "pageURL", "BookId"
+        FROM "Pages"
+        WHERE "BookId" = ${parseInt(bookId)} AND "pageNumber" = ANY(${pageNumbers.map(n => parseInt(n))})
+        ORDER BY "pageNumber"
+      `;
+    }
 
     if (pages.length === 0) {
       return res.status(400).json({

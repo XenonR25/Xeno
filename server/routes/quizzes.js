@@ -3,9 +3,15 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const postgres = require('postgres');
+const axios = require('axios');
 const { DATABASE_URL } = require('../db');
 const { extractTextFromImageUrl } = require('../utils/pdfProcessor');
-const { callOpenAI, callGemini, callDeepSeek } = require('./test1');
+require('dotenv').config({ path: path.join(__dirname, '../.env.local') });
+
+// Get API keys from environment
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
 // Database connection
 const sql = postgres(DATABASE_URL, {
@@ -13,6 +19,111 @@ const sql = postgres(DATABASE_URL, {
   idle_timeout: 20,
   connect_timeout: 10,
 });
+
+// OpenAI API integration
+async function callOpenAI(prompt, context) {
+  try {
+    console.log(`🤖 [OPENAI] Calling OpenAI API...`);
+    
+    if (!OPENAI_API_KEY) {
+      throw new Error("OpenAI API key not found in environment variables");
+    }
+
+    const response = await axios.post("https://api.openai.com/v1/chat/completions", {
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant that provides detailed explanations and generates quiz questions based on the given context."
+        },
+        {
+          role: "user",
+          content: `Context: ${context}\n\nPrompt: ${prompt}`
+        }
+      ],
+      max_tokens: 2000,
+      temperature: 0.7
+    }, {
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log(`✅ [OPENAI] Response received successfully`);
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error(`❌ [OPENAI] API error:`, error.response?.data || error.message);
+    throw new Error(`OpenAI API failed: ${error.message}`);
+  }
+}
+
+// Gemini API integration
+async function callGemini(prompt, context) {
+  try {
+    console.log(`🤖 [GEMINI] Calling Gemini API...`);
+    
+    if (!GEMINI_API_KEY) {
+      throw new Error("Gemini API key not found in environment variables");
+    }
+
+    const response = await axios.post(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+      contents: [{
+        parts: [{
+          text: `Context: ${context}\n\nPrompt: ${prompt}`
+        }]
+      }]
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log(`✅ [GEMINI] Response received successfully`);
+    return response.data.candidates[0].content.parts[0].text;
+  } catch (error) {
+    console.error(`❌ [GEMINI] API error:`, error.response?.data || error.message);
+    throw new Error(`Gemini API failed: ${error.message}`);
+  }
+}
+
+// DeepSeek API integration
+async function callDeepSeek(prompt, context) {
+  try {
+    console.log(`🤖 [DEEPSEEK] Calling DeepSeek API...`);
+    
+    if (!DEEPSEEK_API_KEY) {
+      throw new Error("DeepSeek API key not found in environment variables");
+    }
+
+    const response = await axios.post("https://api.deepseek.com/chat/completions", {
+      model: "deepseek-chat",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant that provides detailed explanations and generates quiz questions based on the given context."
+        },
+        {
+          role: "user",
+          content: `Context: ${context}\n\nPrompt: ${prompt}`
+        }
+      ],
+      max_tokens: 2000,
+      temperature: 0.7
+    }, {
+      headers: {
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log(`✅ [DEEPSEEK] Response received successfully`);
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error(`❌ [DEEPSEEK] API error:`, error.response?.data || error.message);
+    throw new Error(`DeepSeek API failed: ${error.message}`);
+  }
+}
 
 /**
  * @swagger

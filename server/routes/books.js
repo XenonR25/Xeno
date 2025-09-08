@@ -159,8 +159,8 @@ router.post(
           (page) =>
             sql`
             INSERT INTO "Pages" ("pageNumber", "pageURL", "PageId", "cloudinaryId", "BookId")
-            VALUES (${page.pageNumber}, ${page.pageURL}, ${page.uniquePageId}, ${page.cloudinaryId}, ${bookId})
-            RETURNING "PageId", "pageNumber", "pageURL", "PageId", "cloudinaryId"
+            VALUES (${page.pageNumber}, ${page.pageURL}, ${page.pageId}, ${page.cloudinaryId}, ${bookId})
+            RETURNING "PageId", "pageNumber", "pageURL", "cloudinaryId"
           `
         )
       );
@@ -378,7 +378,7 @@ router.get("/:bookId/pages", authenticateToken, async (req, res) => {
 
     // Check if book exists and belongs to user
     const book = await sql`
-      SELECT "BookId", "Name" FROM "Books" 
+      SELECT "BookId", "Name", "author" FROM "Books" 
       WHERE "BookId" = ${parseInt(bookId)} AND "UserId" = ${userId}
     `;
 
@@ -389,7 +389,7 @@ router.get("/:bookId/pages", authenticateToken, async (req, res) => {
       });
     }
 
-    // Get all pages
+    // Get all pages with dynamic Cloudinary URL generation
     const pages = await sql`
       SELECT "PageId", "pageNumber", "pageURL", "cloudinaryId"
       FROM "Pages" 
@@ -397,11 +397,34 @@ router.get("/:bookId/pages", authenticateToken, async (req, res) => {
       ORDER BY "pageNumber"
     `;
 
+    // Build dynamic Cloudinary URLs using pageId
+    const pagesWithUrls = pages.map(page => {
+      // Extract publicId from existing pageURL or use cloudinaryId
+      let dynamicUrl = page.pageURL;
+      
+      // If pageURL exists and contains cloudinary, use it directly
+      if (page.pageURL && page.pageURL.includes('cloudinary')) {
+        dynamicUrl = page.pageURL;
+      } 
+      // If we have cloudinaryId, build URL dynamically
+      else if (page.cloudinaryId) {
+        const { buildPageImageUrl } = require("../utils/pdfProcessor.js");
+        // Extract publicId from cloudinaryId or pageURL
+        const publicId = page.cloudinaryId || page.PageId;
+        dynamicUrl = buildPageImageUrl(publicId, null, page.pageNumber);
+      }
+
+      return {
+        ...page,
+        pageURL: dynamicUrl
+      };
+    });
+
     return res.json({
       status: "success",
       data: {
         book: book[0],
-        pages,
+        pages: pagesWithUrls,
         totalPages: pages.length,
       },
     });
@@ -415,39 +438,57 @@ router.get("/:bookId/pages", authenticateToken, async (req, res) => {
   }
 });
 
+
 /**
  * @swagger
- * /api/books/pages/{PageId}:
+ * /api/books/{bookId}/pages/{pageNumber}:
  *   get:
- *     summary: Get a specific page by its  page ID
+ *     summary: Get a specific page by book ID and page number
  *     tags: [Books]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: PageId
+ *         name: bookId
  *         required: true
  *         schema:
- *           type: string
- *         description: page ID
+ *           type: integer
+ *         description: Book ID
+ *       - in: path
+ *         name: pageNumber
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Page number
  *     responses:
  *       200:
  *         description: Page retrieved successfully
  *       404:
  *         description: Page not found
  */
-router.get("/pages/:PageId", authenticateToken, async (req, res) => {
+router.get("/:bookId/pages/:pageNumber", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { PageId } = req.params;
+    const { bookId, pageNumber } = req.params;
 
-    // Get page with book information
+    // Check if book exists and belongs to user
+    const book = await sql`
+      SELECT "BookId", "Name", "author" FROM "Books" 
+      WHERE "BookId" = ${parseInt(bookId)} AND "UserId" = ${userId}
+    `;
+
+    if (book.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Book not found",
+      });
+    }
+
+    // Get specific page by page number (handle both string and number pageNumber)
     const page = await sql`
-      SELECT p."PageId", p."pageNumber", p."pageURL", p."cloudinaryId",
-             b."BookId", b."Name" as bookName, b."author"
-      FROM "Pages" p
-      JOIN "Books" b ON p."BookId" = b."BookId"
-      WHERE p."PageId" = ${PageId} AND b."UserId" = ${userId}
+      SELECT "PageId", "pageNumber", "pageURL", "cloudinaryId"
+      FROM "Pages" 
+      WHERE "BookId" = ${parseInt(bookId)} AND "pageNumber" = ${parseInt(pageNumber)}
     `;
 
     if (page.length === 0) {
@@ -457,19 +498,24 @@ router.get("/pages/:PageId", authenticateToken, async (req, res) => {
       });
     }
 
+    // Build dynamic Cloudinary URL if needed
+    let dynamicUrl = page[0].pageURL;
+    if (page[0].cloudinaryId && (!page[0].pageURL || !page[0].pageURL.includes('cloudinary'))) {
+      const { buildPageImageUrl } = require("../utils/pdfProcessor.js");
+      dynamicUrl = buildPageImageUrl(page[0].cloudinaryId, null, page[0].pageNumber);
+    }
+
     return res.json({
       status: "success",
       data: {
-        page: page[0],
-        book: {
-          BookId: page[0].BookId,
-          Name: page[0].bookName,
-          author: page[0].author,
-        },
+        PageId: page[0].PageId,
+        pageNumber: page[0].pageNumber,
+        pageURL: dynamicUrl,
+        cloudinaryId: page[0].cloudinaryId,
       },
     });
   } catch (error) {
-    console.error("Get page by unique ID error:", error);
+    console.error("Get specific page error:", error);
     return res.status(500).json({
       status: "error",
       message: "Internal server error",
@@ -714,9 +760,6 @@ router.post(
  *                           pageId:
  *                             type: integer
  *                             description: Database page ID
- *                           uniquePageId:
- *                             type: string
- *                             description: Unique page identifier
  *                           pageNumber:
  *                             type: integer
  *                             description: Page number in the book
@@ -753,7 +796,6 @@ router.get("/:bookId/page-ids", authenticateToken, async (req, res) => {
     const pageIds = await sql`
       SELECT 
         "PageId",
-        "uniquePageId", 
         "pageNumber",
         "cloudinaryId"
       FROM "Pages" 
@@ -769,7 +811,6 @@ router.get("/:bookId/page-ids", authenticateToken, async (req, res) => {
         author: book[0].author,
         pageIds: pageIds.map((page) => ({
           pageId: page.PageId,
-          uniquePageId: page.uniquePageId,
           pageNumber: page.pageNumber,
           cloudinaryId: page.cloudinaryId,
         })),
@@ -846,9 +887,9 @@ router.get("/:bookId/page-ids/simple", authenticateToken, async (req, res) => {
       });
     }
 
-    // Get just the unique page IDs
+    // Get just the page IDs
     const pageIds = await sql`
-      SELECT "uniquePageId"
+      SELECT "PageId"
       FROM "Pages" 
       WHERE "BookId" = ${parseInt(bookId)}
       ORDER BY "pageNumber"
@@ -857,7 +898,7 @@ router.get("/:bookId/page-ids/simple", authenticateToken, async (req, res) => {
     return res.json({
       status: "success",
       data: {
-        pageIds: pageIds.map((page) => page.uniquePageId),
+        pageIds: pageIds.map((page) => page.PageId),
         totalPages: pageIds.length,
       },
     });

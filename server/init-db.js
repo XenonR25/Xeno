@@ -77,6 +77,34 @@ async function initializeDatabase() {
     `;
     console.log("✅ Model table created/verified");
 
+    // Ensure unique model names
+    try {
+      await sql`CREATE UNIQUE INDEX IF NOT EXISTS uq_model_name ON "Model"("ModelName");`;
+    } catch (error) {
+      console.log("⚠️ Could not create unique index on ModelName:", error.message);
+    }
+
+    // Seed fixed models with descriptions (idempotent)
+    try {
+      const models = [
+        { name: 'OpenAI', description: 'OpenAI models for text and chat completion (e.g., GPT-4, GPT-4o, o3).' },
+        { name: 'Gemini', description: 'Google Gemini family for multimodal and text generation (e.g., 1.5 Pro/Flash).' },
+        { name: 'DeepSeek', description: 'DeepSeek models optimized for reasoning and cost-effective generation.' },
+        { name: 'Claude', description: 'Anthropic Claude models focused on helpful and honest conversational AI.' },
+      ];
+
+      for (const m of models) {
+        await sql`
+          INSERT INTO "Model" ("ModelName", "Description")
+          VALUES (${m.name}, ${m.description})
+          ON CONFLICT ("ModelName") DO UPDATE SET "Description" = EXCLUDED."Description";
+        `;
+      }
+      console.log("✅ Seeded fixed AI models (OpenAI, Gemini, DeepSeek, Claude)");
+    } catch (error) {
+      console.log("⚠️ Failed to seed models:", error.message);
+    }
+
     // Create Prompting table
     await sql`
       CREATE TABLE IF NOT EXISTS "Prompting" (

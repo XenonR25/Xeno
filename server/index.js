@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const postgres = require("postgres");
 const path = require("path");
 const swaggerUi = require("swagger-ui-express");
@@ -10,6 +11,14 @@ const { DATABASE_URL } = require("./db.js");
 
 const app = express();
 const PORT = 5000;
+
+// CORS configuration
+app.use(cors({
+  origin: ['http://localhost:3001', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Middleware
 app.use(express.json());
@@ -28,6 +37,9 @@ const bookRoutes = require("./routes/books.js");
 const bookDetailsRoutes = require("./routes/bookDetails.js");
 const modelRoutes = require("./routes/models.js");
 const quizRoutes = require("./routes/quizzes.js");
+const promptRoutes = require("./routes/prompts.js");
+const categoryRoutes = require("./routes/categories.js");
+const explanationRoutes = require("./routes/explanations.js");
 
 // Swagger documentation
 app.use(
@@ -45,6 +57,9 @@ app.use("/api/books", bookRoutes);
 app.use("/api/books", bookDetailsRoutes);
 app.use("/api/models", modelRoutes);
 app.use("/api/quizzes", quizRoutes);
+app.use("/api/prompts", promptRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/explanations", explanationRoutes);
 
 // Database connection function
 async function connectToDatabase() {
@@ -177,6 +192,12 @@ async function startServer() {
         console.log(`   - GET /api/books/:bookId (Get book details)`);
         console.log(`   - DELETE /api/books/:bookId (Delete book)`);
         console.log(`   - GET /api/books/:bookId/pages (Get book pages)`);
+        console.log(`   - GET /api/models (Get models)`);
+        console.log(`   - GET /api/prompts (Get prompts)`);
+        console.log(`   - POST /api/prompts (Create prompt)`);
+        console.log(`   - GET /api/categories (Get categories)`);
+        console.log(`   - POST /api/categories (Create category)`);
+        console.log(`   - POST /api/explanations/generate (Generate explanations)`);
       });
     } else {
       console.error(
