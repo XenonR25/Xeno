@@ -1,0 +1,141 @@
+{
+  "quizId": "15",
+  "questions": [
+    {
+      "questionId": "122",
+      "question": "What is the primary role of livestock in Bangladesh's agricultural economy and rural life?",
+      "options": {
+        "A": "Entertainment for rural communities",
+        "B": "A common livelihood for many farmers",
+        "C": "A source of protein for rural communities",
+        "D": "A means of transportation in rural areas"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text specifies that cattle rearing is a common livelihood for many farmers, particularly in rural and semi-urban regions.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "123",
+      "question": "What major issues are associated with traditional cattle trading in Bangladesh?",
+      "options": {
+        "A": "Lack of standardization in pricing and absence of formal documentation",
+        "B": "Excessive government regulations and taxation",
+        "C": "Lack of cattle rearing expertise among farmers",
+        "D": "Excessive use of technology in cattle trading"
+      },
+      "correctAnswer": "A",
+      "explanation": "The text states that traditional cattle trading lacks transparency and standardization in pricing and formal documentation, leading to fraudulent activities and disputes.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "124",
+      "question": "How does GoruLagbe contribute to modernizing livestock trade in Bangladesh?",
+      "options": {
+        "A": "By providing a platform for cattle dancing competitions",
+        "B": "By providing a digital marketplace for cattle trading",
+        "C": "By offering veterinary services to cattle farmers",
+        "D": "By providing transportation services for cattle farmers"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text mentions that GoruLagbe is a comprehensive digital marketplace for cattle trading, providing structure, transparency, and efficiency.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "125",
+      "question": "What are the core functionalities of the GoruLagbe platform?",
+      "options": {
+        "A": "Cattle detail creation, direct buyer-seller communication, secure profile verification, AI-powered price recommendations",
+        "B": "Online cattle auctioning, cattle transportation services, cattle health insurance",
+        "C": "Cattle breeding services, livestock feed supply, veterinary services",
+        "D": "Cattle rearing training, livestock farming equipment supply, cattle disease control"
+      },
+      "correctAnswer": "A",
+      "explanation": "The text highlights that GoruLagbe supports functionalities like cattle detail creation, direct buyer-seller communication, secure profile verification, and AI-powered price recommendations.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "126",
+      "question": "What is the architecture of the GoruLagbe platform designed for?",
+      "options": {
+        "A": "Performance, modularity, and simplicity",
+        "B": "Aesthetics, complexity, and rigidity",
+        "C": "Inefficiency, disorganization, and complexity",
+        "D": "Non-performance, singularity, and complexity"
+      },
+      "correctAnswer": "A",
+      "explanation": "The text states that the architecture of GoruLagbe is designed for performance, modularity, and simplicity, suitable for a web-based cattle trading platform.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "127",
+      "question": "What type of architecture does GoruLagbe follow?",
+      "options": {
+        "A": "Two-tier architecture",
+        "B": "Three-tier architecture",
+        "C": "Four-tier architecture",
+        "D": "Five-tier architecture"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text mentions that GoruLagbe follows a three-tier architecture, comprising a client interface (frontend), application logic (backend), and persistent storage (database).",
+      "myAnswer": null
+    },
+    {
+      "questionId": "128",
+      "question": "How does GoruLagbe handle communication between the frontend and backend?",
+      "options": {
+        "A": "Through RESTful APIs",
+        "B": "Through SOAP protocols",
+        "C": "Through XML messaging",
+        "D": "Through direct database access"
+      },
+      "correctAnswer": "A",
+      "explanation": "The text specifies that GoruLagbe follows a client-server architecture with RESTful APIs facilitating communication between the frontend and backend.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "129",
+      "question": "What is the responsibility of the Frontend Layer in GoruLagbe's system architecture?",
+      "options": {
+        "A": "Handling database transactions",
+        "B": "Processing business logic",
+        "C": "Managing UI/UX and user interaction",
+        "D": "Controlling system security"
+      },
+      "correctAnswer": "C",
+      "explanation": "According to the text, the Frontend Layer of GoruLagbe's system architecture is responsible for UI/UX and user interaction.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "130",
+      "question": "Why is GoruLagbe's solution considered timely and transformative for Bangladesh’s rural economy?",
+      "options": {
+        "A": "Because it integrates advanced veterinary services",
+        "B": "Because it offers financial assistance to farmers",
+        "C": "Because it provides agricultural training programs",
+        "D": "Because it leverages digital technology to modernize livestock trading"
+      },
+      "correctAnswer": "D",
+      "explanation": "The text indicates that GoruLagbe is timely and transformative because it leverages digital technology to modernize livestock trading, empowering local farmers and creating a more equitable and accessible livestock trading ecosystem.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "131",
+      "question": "What does the absence of any formal documentation or digital trail in traditional cattle trading lead to?",
+      "options": {
+        "A": "Faster transactions",
+        "B": "More transparent pricing",
+        "C": "Fraudulent activities, misrepresentations, and disputes",
+        "D": "Better accessibility for rural farmers"
+      },
+      "correctAnswer": "C",
+      "explanation": "The text mentions that the absence of any formal documentation or digital trail in traditional cattle trading leads to fraudulent activities, misrepresentations, and disputes, which are common and difficult to resolve.",
+      "myAnswer": null
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-09-10T16:27:01.680Z",
+    "totalQuestions": 10,
+    "difficulty": "medium",
+    "generatedBy": "AI"
+  }
+}

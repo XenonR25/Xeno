@@ -11,10 +11,11 @@ import {
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { apiService } from '@/lib/api';
+import { authService } from '@/lib/auth';
 import toast from 'react-hot-toast';
 
 interface Page {
-  PageId: number;
+  PageId: string;
   pageNumber: number;
   pageURL: string;
   cloudinaryId: string;
@@ -37,9 +38,9 @@ export default function BookPagesPage() {
   
   const [bookDetails, setBookDetails] = useState<BookDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedPageIds, setSelectedPageIds] = useState<number[]>([]);
+  const [selectedPageIds, setSelectedPageIds] = useState<string[]>([]);
   const [explaining, setExplaining] = useState(false);
-  const [explanations, setExplanations] = useState<Array<{pageNumber: number, explanation: string}>>([]);
+  const [explanations, setExplanations] = useState<Array<{pageNumber: number, explanation: string, pageId?: string}>>([]);
   const [showExplanationModal, setShowExplanationModal] = useState(false);
   const [generatingQuiz, setGeneratingQuiz] = useState(false);
 
@@ -111,7 +112,7 @@ export default function BookPagesPage() {
       // Check if the PageId is already in the selection
       if (prevSelectedPageIds.includes(pageId)) {
         // If it is, remove it from the array (deselect)
-        const newSelection = prevSelectedPageIds.filter((id: number) => id !== pageId);
+        const newSelection = prevSelectedPageIds.filter((id: string) => id !== pageId);
         console.log('Deselecting PageId, new selection:', newSelection);
         return newSelection;
       } else {
@@ -144,18 +145,28 @@ export default function BookPagesPage() {
       // Make actual API call to generate explanations using direct API call
       const categoryId = 1; // This should come from user selection or default category
       
-      // Get token and user info
-      const token = localStorage.getItem('xeno_token');
-      if (!token) {
+      // Get token and user info using authService
+      if (!authService.isAuthenticated()) {
         toast.error('Please log in to generate explanations');
+        return;
+      }
+      
+      const token = authService.getToken();
+      if (!token) {
+        toast.error('Authentication token not found. Please log in again.');
         return;
       }
 
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      // Debug: Log the selected page IDs and book details
+      console.log('🔍 DEBUG: Selected PageIds:', selectedPageIds);
+      console.log('🔍 DEBUG: Book details pages:', bookDetails.pages.map(p => ({ PageId: p.PageId, pageNumber: p.pageNumber })));
+      
       console.log('Making explanation request with:', {
         pageIds: selectedPageIds,
         categoryId: categoryId,
-        token: token ? 'Present' : 'Missing'
+        token: token ? 'Present' : 'Missing',
+        bookId: bookId
       });
 
       const response = await axios.post(`${API_BASE_URL}/api/explanations/generate`, {
@@ -181,22 +192,16 @@ export default function BookPagesPage() {
           if (page) {
             explanationResults.push({
               pageNumber: page.pageNumber,
-              explanation: explanation.Response || 'No explanation available'
+              explanation: explanation.Response || 'No explanation available',
+              pageId: explanation.PageId
             });
           }
         }
-      } else if (response.data && response.data.data && response.data.data.aiResponse) {
-        // Handle case where there's a single combined response for all pages
-        const combinedExplanation = response.data.data.aiResponse;
-        selectedPageIds.forEach(pageId => {
-          const page = bookDetails.pages.find(p => p.PageId === pageId);
-          if (page) {
-            explanationResults.push({
-              pageNumber: page.pageNumber,
-              explanation: combinedExplanation
-            });
-          }
-        });
+        console.log(`✅ Processed ${explanationResults.length} individual page explanations`);
+      } else {
+        console.log('⚠️ Unexpected API response structure, no explanations found');
+        toast.error('Unexpected response format from server');
+        return;
       }
 
       // Sort by page number for consistent display
@@ -252,7 +257,7 @@ export default function BookPagesPage() {
       }, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('xeno_token') || ''}`
+          'Authorization': `Bearer ${authService.getToken() || ''}`
         }
       });
       

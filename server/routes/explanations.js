@@ -239,13 +239,21 @@ router.post("/generate", authenticateToken, async (req, res) => {
     // Resolve pages to process
     let pages = [];
     if (pageIds && Array.isArray(pageIds) && pageIds.length > 0) {
-      // Get pages by PageId list
+      console.log(`🔍 [DEBUG] Searching for pages with PageIds:`, pageIds);
+      console.log(`🔍 [DEBUG] PageIds types:`, pageIds.map(id => typeof id));
+      
+      // Get pages by PageId list - handle both string and integer PageIds
       pages = await sql`
         SELECT "PageId", "pageNumber", "pageURL", "BookId"
         FROM "Pages"
-        WHERE "PageId" = ANY(${pageIds.map(id => parseInt(id))})
+        WHERE "PageId" = ANY(${pageIds})
         ORDER BY "pageNumber"
       `;
+      
+      console.log(`🔍 [DEBUG] Found ${pages.length} pages in database`);
+      if (pages.length > 0) {
+        console.log(`🔍 [DEBUG] Found pages:`, pages.map(p => ({ PageId: p.PageId, pageNumber: p.pageNumber, BookId: p.BookId })));
+      }
     } else if (bookId && pageNumbers && Array.isArray(pageNumbers) && pageNumbers.length > 0) {
       // Get pages by bookId and pageNumbers
       pages = await sql`
@@ -257,9 +265,17 @@ router.post("/generate", authenticateToken, async (req, res) => {
     }
 
     if (pages.length === 0) {
+      console.log(`❌ [DEBUG] No pages found. Checking all pages in database...`);
+      const allPages = await sql`SELECT "PageId", "pageNumber", "BookId" FROM "Pages" LIMIT 10`;
+      console.log(`🔍 [DEBUG] Sample pages in database:`, allPages);
+      
       return res.status(400).json({
         status: "error",
         message: "No valid pages found for the provided pageIds",
+        debug: {
+          requestedPageIds: pageIds,
+          samplePagesInDb: allPages
+        }
       });
     }
 
@@ -267,7 +283,6 @@ router.post("/generate", authenticateToken, async (req, res) => {
     console.log(`📋 [PROCESS] Pages to process: ${pages.map(p => `Page ${p.pageNumber} (ID: ${p.PageId})`).join(', ')}`);
 
     // Process OCR for all pages
-    let combinedContext = "";
     const ocrResults = [];
     let successfulOCR = 0;
     let failedOCR = 0;
@@ -278,7 +293,6 @@ router.post("/generate", authenticateToken, async (req, res) => {
       
       try {
         const pageText = await processOCR(page.pageURL, page.pageNumber);
-        combinedContext += `\n--- Page ${page.pageNumber} ---\n${pageText}\n`;
         ocrResults.push({
           pageId: page.PageId,
           pageNumber: page.pageNumber,
@@ -290,7 +304,6 @@ router.post("/generate", authenticateToken, async (req, res) => {
       } catch (error) {
         console.error(`❌ [PROCESS] OCR failed for page ${page.PageId}:`, error);
         const errorText = `[OCR Error: ${error.message}]`;
-        combinedContext += `\n--- Page ${page.pageNumber} (OCR Failed) ---\n${errorText}\n`;
         ocrResults.push({
           pageId: page.PageId,
           pageNumber: page.pageNumber,
@@ -304,67 +317,67 @@ router.post("/generate", authenticateToken, async (req, res) => {
     console.log(`\n📊 [OCR SUMMARY] OCR processing completed:`);
     console.log(`   ✅ Successful: ${successfulOCR} pages`);
     console.log(`   ❌ Failed: ${failedOCR} pages`);
-    console.log(`   📝 Total context length: ${combinedContext.length} characters`);
 
-    console.log(`\n🤖 [AI] Starting AI model processing`);
+    console.log(`\n🤖 [AI] Starting individual AI processing for each page`);
     console.log(`🎯 [AI] Selected model: ${categoryInfo.ModelName}`);
     console.log(`💭 [AI] Using prompt: "${categoryInfo.Prompt.substring(0, 100)}..."`);
-    console.log(`📄 [AI] Context length: ${combinedContext.length} characters`);
     console.log(`🔗 [AI] Category: ${categoryInfo.CategoryName} - ${categoryInfo.CategoryDescription}`);
 
-    let aiResponse;
-    
-    try {
-      console.log(`🚀 [AI] Preparing to call AI model...`);
-      console.log(`📤 [AI] Sending prompt + context to ${categoryInfo.ModelName}`);
-      
-      // Determine model type and call appropriate API
-      console.log(`🔧 [AI] Determining model type from: ${categoryInfo.ModelName}`);
+    // Helper function to call AI API based on model type
+    const callAIModel = async (context, prompt) => {
       const modelType = categoryInfo.ModelName.toLowerCase();
       
       if (modelType.includes('gpt') || modelType.includes('chatgpt') || modelType.includes('openai')) {
-        console.log(`🤖 [AI] Calling OpenAI API...`);
-        aiResponse = await callOpenAI(combinedContext, categoryInfo.Prompt);
-        console.log(`✅ [AI] OpenAI response received`);
+        return await callOpenAI(context, prompt);
       } else if (modelType.includes('gemini')) {
-        console.log(`🤖 [AI] Calling Gemini API...`);
-        aiResponse = await callGemini(combinedContext, categoryInfo.Prompt);
-        console.log(`✅ [AI] Gemini response received`);
+        return await callGemini(context, prompt);
       } else if (modelType.includes('deepseek')) {
-        console.log(`🤖 [AI] Calling DeepSeek API...`);
-        aiResponse = await callDeepSeek(combinedContext, categoryInfo.Prompt);
-        console.log(`✅ [AI] DeepSeek response received`);
+        return await callDeepSeek(context, prompt);
       } else {
         console.log(`⚠️ [AI] Unknown model type: ${modelType}, using fallback`);
         if (OPENAI_API_KEY) {
-          aiResponse = await callOpenAI(combinedContext, categoryInfo.Prompt);
+          return await callOpenAI(context, prompt);
         } else if (GEMINI_API_KEY) {
-          aiResponse = await callGemini(combinedContext, categoryInfo.Prompt);
+          return await callGemini(context, prompt);
         } else if (DEEPSEEK_API_KEY) {
-          aiResponse = await callDeepSeek(combinedContext, categoryInfo.Prompt);
+          return await callDeepSeek(context, prompt);
         } else {
           throw new Error("No API keys available for AI processing");
         }
       }
+    };
 
-      console.log(`✅ [AI] Model response received successfully`);
-      console.log(`📝 [AI] Response length: ${aiResponse.length} characters`);
-      console.log(`🔍 [AI] Response preview: "${aiResponse.substring(0, 150)}..."`)
-
-    } catch (error) {
-      console.error(`❌ [AI] AI API call failed:`, error);
-      aiResponse = `AI processing failed: ${error.message}. OCR was successful for ${ocrResults.length} pages.`;
-      console.log(`🔄 [AI] Using fallback response due to API failure`);
-    }
-
-    // Store explanations for each page
-    console.log(`\n💾 [DATABASE] Starting to store explanations in database`);
-    console.log(`📊 [DATABASE] Will create ${pages.length} explanation records`);
+    // Generate individual explanations for each page
+    console.log(`\n💾 [DATABASE] Starting to generate and store individual explanations`);
+    console.log(`📊 [DATABASE] Will create ${ocrResults.length} explanation records`);
     
     const explanations = [];
-    for (let i = 0; i < pages.length; i++) {
-      const page = pages[i];
-      console.log(`💾 [DATABASE] Inserting explanation ${i + 1}/${pages.length} for Page ${page.pageNumber} (ID: ${page.PageId})`);
+    for (let i = 0; i < ocrResults.length; i++) {
+      const ocrResult = ocrResults[i];
+      const page = pages.find(p => p.PageId === ocrResult.pageId);
+      
+      console.log(`🤖 [AI] Processing page ${i + 1}/${ocrResults.length} - Page ${ocrResult.pageNumber} (ID: ${ocrResult.pageId})`);
+      
+      let aiResponse;
+      try {
+        // Create individual context for this page
+        const pageContext = `Page ${ocrResult.pageNumber} content:\n${ocrResult.extractedText}`;
+        
+        console.log(`📤 [AI] Sending individual page context to ${categoryInfo.ModelName}`);
+        console.log(`📄 [AI] Page context length: ${pageContext.length} characters`);
+        
+        aiResponse = await callAIModel(pageContext, categoryInfo.Prompt);
+        console.log(`✅ [AI] Individual response received for page ${ocrResult.pageNumber}`);
+        console.log(`📝 [AI] Response length: ${aiResponse.length} characters`);
+        
+      } catch (error) {
+        console.error(`❌ [AI] AI API call failed for page ${ocrResult.pageNumber}:`, error);
+        aiResponse = `AI processing failed for page ${ocrResult.pageNumber}: ${error.message}. OCR ${ocrResult.status === 'success' ? 'was successful' : 'failed'}.`;
+        console.log(`🔄 [AI] Using fallback response for page ${ocrResult.pageNumber}`);
+      }
+
+      // Store explanation for this specific page
+      console.log(`💾 [DATABASE] Inserting explanation ${i + 1}/${ocrResults.length} for Page ${ocrResult.pageNumber} (ID: ${ocrResult.pageId})`);
       
       try {
         const newExplanation = await sql`
@@ -372,14 +385,14 @@ router.post("/generate", authenticateToken, async (req, res) => {
             "Response", "CategoryId", "PageId"
           )
           VALUES (
-            ${aiResponse}, ${parseInt(categoryId)}, ${page.PageId}
+            ${aiResponse}, ${parseInt(categoryId)}, ${ocrResult.pageId}
           )
           RETURNING "ExplanationId", "Response", "CategoryId", "PageId", "created_at"
         `;
         explanations.push(newExplanation[0]);
         console.log(`✅ [DATABASE] Explanation ${i + 1} stored successfully - ID: ${newExplanation[0].ExplanationId}`);
       } catch (dbError) {
-        console.error(`❌ [DATABASE] Failed to store explanation for Page ${page.PageId}:`, dbError);
+        console.error(`❌ [DATABASE] Failed to store explanation for Page ${ocrResult.pageId}:`, dbError);
         throw dbError;
       }
     }
@@ -394,8 +407,6 @@ router.post("/generate", authenticateToken, async (req, res) => {
     console.log(`   ❌ OCR failed: ${failedOCR}`);
     console.log(`   💾 Explanations stored: ${explanations.length}`);
     console.log(`   🤖 AI model used: ${categoryInfo.ModelName}`);
-    console.log(`   📝 Total context length: ${combinedContext.length} characters`);
-    console.log(`   🔤 AI response length: ${aiResponse.length} characters`);
 
     return res.status(201).json({
       status: "success",
@@ -405,13 +416,11 @@ router.post("/generate", authenticateToken, async (req, res) => {
         category: categoryInfo,
         processedPages: pages.length,
         ocrResults: ocrResults,
-        aiResponse: aiResponse,
         statistics: {
           totalPages: pages.length,
           successfulOCR: successfulOCR,
           failedOCR: failedOCR,
-          contextLength: combinedContext.length,
-          responseLength: aiResponse.length
+          explanationsGenerated: explanations.length
         }
       },
     });

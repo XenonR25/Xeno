@@ -1,0 +1,31 @@
+{
+  "quiz": {
+    "quizId": "15",
+    "difficulty": "medium",
+    "pages": [
+      {
+        "pageId": "page_23_3_1757447461509_j7prp2",
+        "pageNumber": "3",
+        "bookTitle": "GoruLagbe: Modernizing Livestock Trade: Bringing Tradition Online",
+        "bookId": "23"
+      },
+      {
+        "pageId": "page_23_4_1757447461511_4qmjyy",
+        "pageNumber": "4",
+        "bookTitle": "GoruLagbe: Modernizing Livestock Trade: Bringing Tradition Online",
+        "bookId": "23"
+      }
+    ],
+    "userId": "1",
+    "userName": "nafi",
+    "createdAt": "2025-09-10T16:26:17.380Z",
+    "score": 0
+  },
+  "metadata": {
+    "timestamp": "2025-09-10T16:27:01.680Z",
+    "totalPages": 2,
+    "successfulOCR": 2,
+    "totalCharacters": 4695,
+    "testType": "quiz_generation_api"
+  }
+}
