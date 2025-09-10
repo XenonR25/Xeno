@@ -141,11 +141,31 @@ export const apiService = {
         PageId: number;
         created_at: string;
       }>;
-      category: any;
+      category: {
+        CategoryId: number;
+        CategoryName: string;
+        CategoryDescription: string;
+        ModelId: number;
+        ModelName: string;
+        ModelDescription: string;
+        PromptId: number;
+        Prompt: string;
+      };
       processedPages: number;
-      ocrResults: any[];
+      ocrResults: Array<{
+        pageId: number;
+        pageNumber: number;
+        extractedText: string;
+        status: string;
+      }>;
       aiResponse: string;
-      statistics: any;
+      statistics: {
+        totalPages: number;
+        successfulOCR: number;
+        failedOCR: number;
+        contextLength: number;
+        responseLength: number;
+      };
     };
   }> => {
     const response = await api.post('/api/explanations/generate', {
@@ -162,7 +182,40 @@ export const apiService = {
   ): Promise<{
     status: string;
     message: string;
-    data: any;
+    data: {
+      explanations: Array<{
+        ExplanationId: number;
+        Response: string;
+        CategoryId: number;
+        PageId: number;
+        created_at: string;
+      }>;
+      category: {
+        CategoryId: number;
+        CategoryName: string;
+        CategoryDescription: string;
+        ModelId: number;
+        ModelName: string;
+        ModelDescription: string;
+        PromptId: number;
+        Prompt: string;
+      };
+      processedPages: number;
+      ocrResults: Array<{
+        pageId: number;
+        pageNumber: number;
+        extractedText: string;
+        status: string;
+      }>;
+      aiResponse: string;
+      statistics: {
+        totalPages: number;
+        successfulOCR: number;
+        failedOCR: number;
+        contextLength: number;
+        responseLength: number;
+      };
+    };
   }> => {
     const response = await api.post('/api/explanations/generate', {
       bookId,
@@ -172,15 +225,192 @@ export const apiService = {
     return response.data;
   },
 
-  // Get individual page by page number - optimized for single page extraction
+  // Get explanations with filters
+  getExplanations: async (categoryId?: number, pageId?: number): Promise<{
+    status: string;
+    data: {
+      explanations: Array<{
+        ExplanationId: number;
+        Response: string;
+        CategoryId: number;
+        PageId: number;
+        created_at: string;
+        CategoryName: string;
+        CategoryDescription: string;
+        pageNumber: number;
+        pageURL: string;
+      }>;
+      total: number;
+      filters: { categoryId?: number; pageId?: number };
+    };
+  }> => {
+    const params = new URLSearchParams();
+    if (categoryId) params.append('categoryId', categoryId.toString());
+    if (pageId) params.append('pageId', pageId.toString());
+    
+    const response = await api.get(`/api/explanations?${params.toString()}`);
+    return response.data;
+  },
+
+  // Get specific explanation by ID
+  getExplanationById: async (explanationId: number): Promise<{
+    status: string;
+    data: {
+      ExplanationId: number;
+      Response: string;
+      CategoryId: number;
+      PageId: number;
+      created_at: string;
+      CategoryName: string;
+      CategoryDescription: string;
+      pageNumber: number;
+      pageURL: string;
+      ModelName: string;
+      Prompt: string;
+    };
+  }> => {
+    const response = await api.get(`/api/explanations/${explanationId}`);
+    return response.data;
+  },
+
+  // Update explanation
+  updateExplanation: async (explanationId: number, responseText: string): Promise<{
+    status: string;
+    message: string;
+    data: {
+      ExplanationId: number;
+      Response: string;
+      CategoryId: number;
+      PageId: number;
+      created_at: string;
+    };
+  }> => {
+    const response = await api.put(`/api/explanations/${explanationId}`, {
+      Response: responseText,
+    });
+    return response.data;
+  },
+
+  // Delete explanation
+  deleteExplanation: async (explanationId: number): Promise<{
+    status: string;
+    message: string;
+    data: {
+      ExplanationId: number;
+      Response: string;
+    };
+  }> => {
+    const response = await api.delete(`/api/explanations/${explanationId}`);
+    return response.data;
+  },
+
   getPageByNumber: async (bookId: number, pageNumber: number) => {
     const response = await api.get(`/api/books/${bookId}/pages/${pageNumber}`);
     return response.data;
   },
 
-  // Users - Change Password
-  changePassword: async (currentPassword: string, newPassword: string): Promise<{ status: string; message: string }> => {
-    const response = await api.post('/api/users/change-password', { currentPassword, newPassword });
+  // Change password
+  changePassword: async (currentPassword: string, newPassword: string): Promise<{
+    status: string;
+    message: string;
+  }> => {
+    const response = await api.post('/api/auth/change-password', {
+      currentPassword,
+      newPassword,
+    });
+    return response.data;
+  },
+
+  // Generate quiz for specific pages
+  generateQuiz: async (pageIds: string[], difficulty: string = 'medium'): Promise<{
+    success: boolean;
+    quiz: {
+      quizId: number;
+      difficulty: string;
+      pages: Array<{
+        pageId: string;
+        pageNumber: number;
+        bookTitle: string;
+        bookId: number;
+      }>;
+      userId: number;
+      createdAt: string;
+      score: number;
+    };
+    questions: Array<{
+      questionId: number;
+      question: string;
+      options: any;
+      correctAnswer: string;
+      explanation: string;
+      myAnswer: null;
+    }>;
+  }> => {
+    const response = await api.post('/api/quizzes/generate', {
+      pageIds,
+      difficulty,
+      questionCount: 10
+    });
+    return response.data;
+  },
+
+  // Get quiz by ID
+  getQuiz: async (quizId: number): Promise<{
+    quiz: {
+      QuizId: number;
+      Difficulty: string;
+      Pages: any;
+      UserId: number;
+      Score: number;
+      created_at: string;
+      updated_at: string;
+    };
+    questions: Array<{
+      QuestionId: number;
+      Questions: string;
+      Answers: string;
+      myAnswer: string | null;
+      Options: any;
+      Explanation: string;
+    }>;
+  }> => {
+    const response = await api.get(`/api/quizzes/${quizId}`);
+    return response.data;
+  },
+
+  // Submit quiz answers
+  submitQuiz: async (quizId: number, answers: Record<number, string>): Promise<{
+    success: boolean;
+    quizId: number;
+    score: number;
+    correctAnswers: number;
+    totalQuestions: number;
+    results: Array<{
+      questionId: number;
+      userAnswer: string;
+      correctAnswer: string;
+      isCorrect: boolean;
+    }>;
+  }> => {
+    const response = await api.post(`/api/quizzes/${quizId}/submit`, {
+      answers
+    });
+    return response.data;
+  },
+
+  // Get user's quiz history
+  getUserQuizzes: async (userId: number): Promise<{
+    quizzes: Array<{
+      QuizId: number;
+      Difficulty: string;
+      Pages: any;
+      Score: number;
+      created_at: string;
+      updated_at: string;
+      question_count: number;
+    }>;
+  }> => {
+    const response = await api.get(`/api/quizzes/user/${userId}`);
     return response.data;
   },
 };

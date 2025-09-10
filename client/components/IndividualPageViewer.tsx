@@ -10,9 +10,11 @@ import {
   MagnifyingGlassPlusIcon,
   ArrowsPointingOutIcon,
   ArrowsPointingInIcon,
-  SparklesIcon
+  SparklesIcon,
+  AcademicCapIcon
 } from '@heroicons/react/24/outline';
 import { apiService } from '@/lib/api';
+import axios from 'axios';
 import toast from 'react-hot-toast';
 
 interface PageData {
@@ -54,6 +56,7 @@ export default function IndividualPageViewer({
   const [explaining, setExplaining] = useState(false);
   const [explanationModalOpen, setExplanationModalOpen] = useState(false);
   const [explanationText, setExplanationText] = useState<string>('');
+  const [generatingQuiz, setGeneratingQuiz] = useState(false);
   
   // Standardized zoom levels for a familiar experience
   const zoomLevels = [0.5, 0.75, 1, 1.25, 1.5, 2, 3];
@@ -239,6 +242,55 @@ export default function IndividualPageViewer({
     }
   };
 
+  const handleGenerateQuiz = async () => {
+    console.log('🎯 Generate Quiz button clicked');
+    console.log('📄 Current pageData:', pageData);
+    
+    if (!pageData) {
+      console.log('❌ No page data available');
+      toast.error('No page loaded to generate quiz');
+      return;
+    }
+    
+    console.log(`🔢 Using PageId: ${pageData.PageId}`);
+    
+    try {
+      setGeneratingQuiz(true);
+      console.log('🚀 Calling generateQuiz API directly...');
+      
+      // Direct API call as fallback
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const response = await axios.post(`${API_BASE_URL}/api/quizzes/generate`, {
+        pageIds: [pageData.PageId.toString()],
+        difficulty: 'medium',
+        questionCount: 10
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('xeno_token') || ''}`
+        }
+      });
+      
+      const resp = response.data;
+      console.log('✅ Quiz generation response:', resp);
+      toast.success('Quiz generated successfully!');
+      
+      // Navigate to quiz page
+      const quizId = resp.quiz?.quizId;
+      console.log(`🎯 Navigating to quiz: ${quizId}`);
+      router.push(`/quiz/${quizId}`);
+      
+    } catch (error: any) {
+      console.error('❌ Failed to generate quiz:', error);
+      console.error('❌ Error details:', error?.response?.data);
+      const errorMessage = error?.response?.data?.message || error?.response?.data?.error || error.message || 'Failed to generate quiz';
+      toast.error(errorMessage);
+    } finally {
+      setGeneratingQuiz(false);
+    }
+  };
+
+
   const handleKeyPress = (e: KeyboardEvent) => {
     if (e.key === 'ArrowLeft') prevPage();
     if (e.key === 'ArrowRight') nextPage();
@@ -362,6 +414,19 @@ export default function IndividualPageViewer({
             >
               <SparklesIcon className="h-4 w-4" />
               <span>{explaining ? 'Explaining...' : 'Explain Page'}</span>
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🎯 Quiz button clicked - event triggered');
+                handleGenerateQuiz();
+              }}
+              disabled={generatingQuiz || !pageData}
+              className="inline-flex items-center space-x-1 bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded transition-colors"
+            >
+              <AcademicCapIcon className="h-4 w-4" />
+              <span>{generatingQuiz ? 'Generating...' : 'Generate Quiz'}</span>
             </button>
           </div>
 

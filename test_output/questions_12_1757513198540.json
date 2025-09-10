@@ -1,0 +1,141 @@
+{
+  "quizId": "12",
+  "questions": [
+    {
+      "questionId": "92",
+      "question": "What is a major challenge in the traditional livestock trading ecosystem according to the text?",
+      "options": {
+        "A": "Lack of middlemen",
+        "B": "Too many buyers",
+        "C": "Inefficiencies and lack of transparency",
+        "D": "Too many online platforms"
+      },
+      "correctAnswer": "C",
+      "explanation": "The text mentions that the traditional livestock trading ecosystem is characterized by inefficiencies, lack of transparency, and dependence on middlemen.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "93",
+      "question": "Why do farmers often receive suboptimal prices for their cattle?",
+      "options": {
+        "A": "Due to unhealthy animals",
+        "B": "Because of online auctions",
+        "C": "Limited access to wider markets",
+        "D": "Overuse of digital platforms"
+      },
+      "correctAnswer": "C",
+      "explanation": "The text states that farmers often receive suboptimal prices for their cattle due to limited access to wider markets.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "94",
+      "question": "Why was GoruLagbe developed?",
+      "options": {
+        "A": "To facilitate real-time communication",
+        "B": "To address systemic challenges in traditional livestock trading",
+        "C": "To create more middlemen",
+        "D": "To discourage the use of digital platforms"
+      },
+      "correctAnswer": "B",
+      "explanation": "GoruLagbe was developed to address systemic challenges such as inefficiencies, lack of transparency, and dependence on middlemen in the traditional livestock trading ecosystem.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "95",
+      "question": "What does the platform’s auction system allow?",
+      "options": {
+        "A": "Sellers to create timed auctions with bidding options",
+        "B": "Buyers to set the price",
+        "C": "Middlemen to control the market",
+        "D": "Buyers to list their cattle"
+      },
+      "correctAnswer": "A",
+      "explanation": "The platform’s auction system allows sellers to create timed auctions with bidding options, enabling competitive and dynamic pricing mechanisms.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "96",
+      "question": "What is a significant drawback of the traditional cattle trading methods?",
+      "options": {
+        "A": "Too much transparency",
+        "B": "Unfair pricing and misinformation about animal health",
+        "C": "Too many buyers",
+        "D": "Overuse of digital platforms"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text mentions that traditional methods of cattle trading present significant drawbacks such as unfair pricing and misinformation about animal health.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "97",
+      "question": "What is a standout feature of GoruLagbe?",
+      "options": {
+        "A": "Real-time bids",
+        "B": "Auction system",
+        "C": "Animal health records",
+        "D": "Physical visits to markets"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text mentions that one of GoruLagbe's standout features is the auction system.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "98",
+      "question": "What kind of opportunities do modern technological advances offer for traditional cattle trading?",
+      "options": {
+        "A": "They offer a transformative opportunity to overhaul the traditional system",
+        "B": "They offer opportunities to increase the number of middlemen",
+        "C": "They offer opportunities to limit market access",
+        "D": "They offer opportunities to decrease transparency"
+      },
+      "correctAnswer": "A",
+      "explanation": "Modern technological advances offer a transformative opportunity to overhaul the traditional livestock trading system, according to the text.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "99",
+      "question": "What is the potential impact of GoruLagbe on rural economies?",
+      "options": {
+        "A": "Decrease in livestock trading",
+        "B": "Increase in middlemen",
+        "C": "Increase in livestock diseases",
+        "D": "Digitization and democratization of cattle trading"
+      },
+      "correctAnswer": "D",
+      "explanation": "According to the text, GoruLagbe has the potential to impact rural economies by digitizing and democratizing cattle trading.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "100",
+      "question": "How does GoruLagbe enhance trust in listings?",
+      "options": {
+        "A": "By providing detailed descriptions and a 'Cow History Card'",
+        "B": "By increasing the number of buyers",
+        "C": "By eliminating the auction system",
+        "D": "By increasing the number of middlemen"
+      },
+      "correctAnswer": "A",
+      "explanation": "GoruLagbe enhances trust in listings by allowing sellers to list their cattle with detailed descriptions, including breed, age, health records, feeding history, and photographs, and by providing a 'Cow History Card'.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "101",
+      "question": "What role does cattle trading play in the rural economy of many developing regions?",
+      "options": {
+        "A": "Minimal role",
+        "B": "Pivotal role",
+        "C": "Negative role",
+        "D": "Undefined role"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text mentions that cattle trading plays a pivotal role in the rural economy of many developing regions.",
+      "myAnswer": null
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-09-10T14:06:38.540Z",
+    "totalQuestions": 10,
+    "difficulty": "medium",
+    "generatedBy": "AI"
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "quizId": "13",
+  "questions": [
+    {
+      "questionId": "102",
+      "question": "What is the primary function of the frontend layer in GoruLagbe's architecture?",
+      "options": {
+        "A": "It contains business logic and API endpoints.",
+        "B": "It is responsible for UI/UX and user interaction.",
+        "C": "It manages persistent data storage.",
+        "D": "It controls auction mechanisms."
+      },
+      "correctAnswer": "B",
+      "explanation": "The frontend layer of GoruLagbe's architecture is responsible for UI/UX and user interaction. This is where the user interacts with the application.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "103",
+      "question": "Which feature does GoruLagbe NOT provide according to the given content?",
+      "options": {
+        "A": "Direct buyer-seller communication",
+        "B": "Auction and bidding system",
+        "C": "Real-time chat and voice messaging",
+        "D": "Automatic livestock delivery"
+      },
+      "correctAnswer": "D",
+      "explanation": "There is no mention of automatic livestock delivery in the given content. Other options are listed as features provided by GoruLagbe.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "104",
+      "question": "What is the purpose of GoruLagbe using a three-tier architecture?",
+      "options": {
+        "A": "To provide a more equitable and accessible livestock trading ecosystem",
+        "B": "To enable real-time interaction, secure access control, auction mechanisms, and robust data handling",
+        "C": "To provide a platform for direct buyer-seller communication",
+        "D": "To integrate veterinary, logistics, and financial services"
+      },
+      "correctAnswer": "B",
+      "explanation": "The three-tier architecture enables real-time interaction, secure access control, auction mechanisms, and robust data handling. It is part of the system design, not directly linked with the platform's purpose.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "105",
+      "question": "Which tool is used to manage navigation between different pages in GoruLagbe's frontend design?",
+      "options": {
+        "A": "React.js",
+        "B": "Express.js",
+        "C": "Node.js",
+        "D": "React Router"
+      },
+      "correctAnswer": "D",
+      "explanation": "React Router is used in GoruLagbe's frontend design to handle navigation between different pages.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "106",
+      "question": "What does the backend layer of GoruLagbe's architecture manage?",
+      "options": {
+        "A": "UI/UX and user interaction",
+        "B": "Business logic, API endpoints, and operations like listing creation, bidding, and user sessions",
+        "C": "Persistent data storage using raw SQL queries",
+        "D": "Auction creation for timed and bulk sales"
+      },
+      "correctAnswer": "B",
+      "explanation": "The backend layer contains business logic, API endpoints, and manages operations like listing creation, bidding, and user sessions.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "107",
+      "question": "What is one of the future enhancements GoruLagbe opens the door to?",
+      "options": {
+        "A": "Automated pricing",
+        "B": "Veterinary integrations",
+        "C": "Creation of a digital currency",
+        "D": "Introduction of artificial intelligence"
+      },
+      "correctAnswer": "B",
+      "explanation": "GoruLagbe opens the door to future enhancements such as veterinary integrations, logistics services, and financial tools.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "108",
+      "question": "What is GoruLagbe's role in Bangladesh's rural economy?",
+      "options": {
+        "A": "It aims to replace the traditional livestock trade",
+        "B": "It aims to leverage digital technology to modernize livestock trade",
+        "C": "It aims to monopolize the livestock market",
+        "D": "None of the above"
+      },
+      "correctAnswer": "B",
+      "explanation": "GoruLagbe is a transformative solution for Bangladesh’s rural economy—leveraging digital technology to modernize a centuries-old tradition.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "109",
+      "question": "What is the role of the database layer in GoruLagbe's architecture?",
+      "options": {
+        "A": "It is responsible for UI/UX and user interaction",
+        "B": "It contains business logic, API endpoints, and manages operations",
+        "C": "It manages persistent data storage using raw SQL queries",
+        "D": "It handles navigation between different pages"
+      },
+      "correctAnswer": "C",
+      "explanation": "The database layer of GoruLagbe's architecture manages persistent data storage using raw SQL queries.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "110",
+      "question": "Which of the following is NOT a key UI component as per GoruLagbe's frontend design?",
+      "options": {
+        "A": "Cattle Listings Page",
+        "B": "Auction Creation and Bidding Interface",
+        "C": "Profile Management and Admin Panel",
+        "D": "Customer Support Page"
+      },
+      "correctAnswer": "D",
+      "explanation": "There is no mention of a 'Customer Support Page' in the key UI components of GoruLagbe's frontend design.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "111",
+      "question": "What is the runtime environment of GoruLagbe's backend design?",
+      "options": {
+        "A": "React.js",
+        "B": "Express.js",
+        "C": "Node.js",
+        "D": "React Router"
+      },
+      "correctAnswer": "C",
+      "explanation": "The runtime environment of GoruLagbe's backend design is Node.js.",
+      "myAnswer": null
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-09-10T14:23:59.745Z",
+    "totalQuestions": 10,
+    "difficulty": "medium",
+    "generatedBy": "AI"
+  }
+}

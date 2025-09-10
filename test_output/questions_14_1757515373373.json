@@ -1,0 +1,141 @@
+{
+  "quizId": "14",
+  "questions": [
+    {
+      "questionId": "112",
+      "question": "What is the primary objective of the GoruLagbe platform?",
+      "options": {
+        "A": "To modernize the livestock trade and empower local farmers",
+        "B": "To provide a platform for selling other agricultural products",
+        "C": "To create a social network for farmers",
+        "D": "To provide an online marketplace for machinery used in farming"
+      },
+      "correctAnswer": "A",
+      "explanation": "The text describes GoruLagbe as a platform designed to modernize livestock trade, empower local farmers and create an equitable and accessible trading ecosystem.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "113",
+      "question": "Which technology does GoruLagbe use to facilitate communication between the frontend and backend?",
+      "options": {
+        "A": "SOAP",
+        "B": "RESTful APIs",
+        "C": "GraphQL",
+        "D": "gRPC"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text mentions that GoruLagbe uses RESTful APIs to facilitate communication between the frontend and backend.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "114",
+      "question": "What kind of architecture does GoruLagbe follow?",
+      "options": {
+        "A": "Four-tier architecture",
+        "B": "Two-tier architecture",
+        "C": "Three-tier architecture",
+        "D": "Monolithic architecture"
+      },
+      "correctAnswer": "C",
+      "explanation": "The text describes GoruLagbe's architecture as comprising a client interface (frontend), application logic (backend), and persistent storage (database), which corresponds to a three-tier architecture.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "115",
+      "question": "What type of design is used for the frontend of GoruLagbe?",
+      "options": {
+        "A": "Functional-based design",
+        "B": "Component-based design",
+        "C": "Service-oriented design",
+        "D": "Container-based design"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text mentions a component-based design for the frontend of GoruLagbe to enhance reusability, maintainability, and performance.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "116",
+      "question": "What does the backend layer of GoruLagbe manage?",
+      "options": {
+        "A": "UI/UX and user interaction",
+        "B": "Business logic, API endpoints, and operations like listing creation, bidding, and user sessions",
+        "C": "Persistent data storage using raw SQL queries",
+        "D": "Real-time interaction, secure access control, auction mechanisms"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text states that the backend layer contains business logic, API endpoints, and manages operations like listing creation, bidding, and user sessions.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "117",
+      "question": "What framework is used in the frontend design of GoruLagbe?",
+      "options": {
+        "A": "Angular.js",
+        "B": "Vue.js",
+        "C": "React.js",
+        "D": "Ember.js"
+      },
+      "correctAnswer": "C",
+      "explanation": "The text states that the frontend framework used in GoruLagbe is React.js.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "118",
+      "question": "Which aspect of GoruLagbe is managed using React Router?",
+      "options": {
+        "A": "User Registration",
+        "B": "UI Components",
+        "C": "Navigation between different pages",
+        "D": "Auction creation and bidding"
+      },
+      "correctAnswer": "C",
+      "explanation": "The text mentions that React Router is used to handle navigation between different pages.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "119",
+      "question": "What type of architecture does GoruLagbe use for communication?",
+      "options": {
+        "A": "Hub and Spoke",
+        "B": "Client-Server",
+        "C": "Peer-to-Peer",
+        "D": "Service-Oriented"
+      },
+      "correctAnswer": "B",
+      "explanation": "The text mentions that GoruLagbe follows a client-server architecture.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "120",
+      "question": "What is one of the future enhancements GoruLagbe is open to according to the text?",
+      "options": {
+        "A": "Adding a social media feature",
+        "B": "Adding a video chat feature",
+        "C": "Veterinary integrations",
+        "D": "Adding a marketplace for other agricultural products"
+      },
+      "correctAnswer": "C",
+      "explanation": "The text mentions that GoruLagbe is open to future enhancements such as veterinary integrations.",
+      "myAnswer": null
+    },
+    {
+      "questionId": "121",
+      "question": "What is the purpose of the database layer in GoruLagbe's architecture?",
+      "options": {
+        "A": "To manage UI/UX elements",
+        "B": "To handle user communication",
+        "C": "To manage persistent data storage",
+        "D": "To handle navigation between different pages"
+      },
+      "correctAnswer": "C",
+      "explanation": "The text states that the database layer in GoruLagbe's architecture manages persistent data storage.",
+      "myAnswer": null
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-09-10T14:42:53.373Z",
+    "totalQuestions": 10,
+    "difficulty": "medium",
+    "generatedBy": "AI"
+  }
+}

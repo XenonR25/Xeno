@@ -207,7 +207,7 @@ async function initializeDatabase() {
       console.log("⚠️ Some indexes could not be created:", error.message);
     }
 
-    console.log("🎉 Database initialization completed successfully!");
+    console.log("✅ Database initialization completed successfully!");
   } catch (error) {
     console.error("❌ Database initialization failed:", error);
     throw error;

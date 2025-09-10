@@ -41,5 +41,10 @@ export const authService = {
   getUserId: (): number | null => {
     const user = authService.getUser();
     return user ? user.UserId : null;
+  },
+
+  // Alias for getUser to match expected method name
+  getCurrentUser: (): User | null => {
+    return authService.getUser();
   }
 };
